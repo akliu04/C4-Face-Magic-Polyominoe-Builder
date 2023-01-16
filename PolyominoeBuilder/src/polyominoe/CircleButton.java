@@ -1,5 +1,6 @@
 package polyominoe;
 import java.awt.Color;
+
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Shape;
@@ -7,6 +8,9 @@ import java.awt.geom.Ellipse2D;
 
 import javax.swing.JButton;
 
+/*
+ * A Helper class to help make Vertices circular.
+ */
 public class CircleButton extends JButton {
 
 	private Color colorNormal;

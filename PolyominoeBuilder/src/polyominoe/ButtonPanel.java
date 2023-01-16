@@ -42,7 +42,6 @@ public class ButtonPanel extends JPanel{
 		// Create the lockButton
 		lockButton = new JToggleButton("Lock");
 		lockButton.setFocusable(false);
-		boolean locked = false;
 		lockButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -91,7 +90,7 @@ public class ButtonPanel extends JPanel{
 		// Add the buttons to it
 		add(lockButton);
 		add(calculateButton);
-		add(clearButton);
 		add(clearVertexNumbersButton);
+		add(clearButton);
 	}
 }

@@ -13,14 +13,14 @@ public class Face extends JButton {
 	// Sum of four Vertices
 	private int sum;
 
-	// Width of the window in pixels
+	// Width of grid_panel in pixels
 	private int width;
 
-	// The absolute pixel coordinates of the Face (relative to the app window, not the user's screen)
+	// The absolute pixel coordinates of the Face (relative to grid_panel)
 	private int xAbsLoc;
 	private int yAbsLoc;
 
-	// The coordinates of the Face as if the window was partitioned into a grid
+	// The coordinates of the Face as if grid_panel was partitioned into a grid
 	private int xGridLoc;
 	private int yGridLoc;
 
@@ -33,6 +33,7 @@ public class Face extends JButton {
 
 	/*
 	 * x and y are the grid coordinates of the Face, the Face is drawn at absolute pixel coordinates
+	 * relative to grid_panel
 	 */
 	public Face(int x, int y, GridPanel parentGrid) {
 		super();
@@ -43,7 +44,7 @@ public class Face extends JButton {
 		xAbsLoc = x*width;
 		yAbsLoc = y*width;
 		setFocusable(false);
-		setFont(new Font("Arial", Font.PLAIN, width / 5));
+		setFont(new Font("Arial", Font.PLAIN, width / 4));
 		setBackground(colorNormal);
 		setSize(width, width);
 		setLocation(xAbsLoc, yAbsLoc);
@@ -80,7 +81,7 @@ public class Face extends JButton {
 
 	/*
 	 * Returns a new Vertex at the position specified relative to this Face 
-	 * If position is 0, a Vertex is created at the top-left of the Face,
+	 * If position is 0, a Vertex is created at the top-left position of the Face,
 	 * and proceeds clockwise for values of 1, 2, and 3.
 	 */
 	public Vertex createVertex(int position) {

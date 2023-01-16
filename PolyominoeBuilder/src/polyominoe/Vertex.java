@@ -5,6 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Vertex extends CircleButton{
+	/*
+	 * The number a Vertex will take on when clicked. 
+	 */
 	private static int nextInt = 1;
 	private int value;
 	
