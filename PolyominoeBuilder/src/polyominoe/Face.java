@@ -68,9 +68,9 @@ public class Face extends JButton {
 				setBackground(colorNormal);
 			}
 
-			// Remove Face when clicked
+			// Remove Face when clicked only if none of its vertices are labeled
 			public void mousePressed(java.awt.event.MouseEvent evt) {
-				if (!parentGrid.isLocked()) {
+				if (!parentGrid.isLocked() && !hasLabeledVertices()) {
 					parentGrid.removeFace((Face) evt.getSource());
 				}
 			}
@@ -141,5 +141,8 @@ public class Face extends JButton {
 		sum = v0.getValue() + v1.getValue() + v2.getValue() + v3.getValue();
 		return sum;
 	}
-
+	
+	private boolean hasLabeledVertices() {
+		return v0.getValue() != 0 || v1.getValue() != 0 || v2.getValue() != 0 || v3.getValue() != 0;
+	}
 }
