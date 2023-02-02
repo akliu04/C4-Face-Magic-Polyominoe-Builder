@@ -16,7 +16,7 @@ public class MainFrame extends JFrame {
 	 * effectively enables (gridWidth-1) * (gridWidth-1) clickable
 	 * Faces
 	 */
-	private static int gridWidth = 21;									
+	private static int gridWidth = 31;									
 	
 	protected static int cellWidth = 100;								// FRAME_WIDTH / gridWidth by default
 	

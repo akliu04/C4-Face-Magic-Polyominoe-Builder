@@ -3,6 +3,7 @@ package polyominoe;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Stack;
+import java.util.TreeSet;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -10,6 +11,13 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 public class ButtonPanel extends JPanel{
+	
+	/*
+	 * A Button that prevents making any changes to ALL Faces & Vertices currently on screen,
+	 * as well as resets Vertex numbering for any future Vertices. Frozen Faces and Vertices
+	 * CANNOT be unfrozen.
+	 */
+	static JButton freezeButton;
 
 	/*
 	 * A Toggle Button that allows the user to choose whether or not Faces can be 
@@ -18,12 +26,6 @@ public class ButtonPanel extends JPanel{
 	 * but the user cannot input Vertex values.
 	 */
 	static JToggleButton lockButton;
-
-	/*
-	 * A Button that calculates all Face values. Is only enabled when all Vertices have 
-	 * a number.
-	 */
-	static JButton calculateButton;
 
 	/*
 	 * A Button that clears all Faces and their Vertices from grid_panel, and empties
@@ -53,9 +55,30 @@ public class ButtonPanel extends JPanel{
 	 * A Panel that contains the UI buttons. Uses a FlowLayout for storing buttons.
 	 */
 	public ButtonPanel(GridPanel gridPanel) {
+		// Create the freezeButton
+		freezeButton = new JButton("Freeze");
+		freezeButton.setFocusable(false);
+		freezeButton.setToolTipText("<html>" 
+										+ "Freeze all polyominoes. Cannot be undone");
+		freezeButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for (Face face : MainFrame.faceArray) {
+					if (face != null) {
+						face.setLockedTrue();
+					}
+				}
+				gridPanel.clearVertexNumbers();
+			}
+		});
+		
 		// Create the lockButton
 		lockButton = new JToggleButton("Lock");
 		lockButton.setFocusable(false);
+		lockButton.setToolTipText("<html>" 
+									+ "While enabled, only editing vertices is allowed "
+									+ "<br>"
+									+ "Use to prevent accidentally drawing unwanted polyominoes");
 		lockButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -67,19 +90,11 @@ public class ButtonPanel extends JPanel{
 			}
 		});
 
-		// Create the calculateButton
-		calculateButton = new JButton("Calculate");
-		calculateButton.setFocusable(false);
-		calculateButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				calculateFaces();
-			}
-		});
-
 		// Create the clearButton
 		clearButton = new JButton("Clear");
 		clearButton.setFocusable(false);
+		clearButton.setToolTipText("<html>" 
+										+ "Clear all polyominoes");
 		clearButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -90,6 +105,8 @@ public class ButtonPanel extends JPanel{
 		// Create the clearVertexNumbersButton
 		clearVertexNumbersButton = new JButton("Renumber");
 		clearVertexNumbersButton.setFocusable(false);
+		clearVertexNumbersButton.setToolTipText("<html>" 
+													+ "Clear all vertex numbers");
 		clearVertexNumbersButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -99,33 +116,41 @@ public class ButtonPanel extends JPanel{
 		
 		// Create the nextNumberLabel
 		nextNumberLabel = new JLabel("Next:");
+		nextNumberLabel.setToolTipText("<html>" 
+										+ "Numbers waiting to be inputted will appear here");
 		
 		// Create the numberQueueLabel
 		numberQueueLabel = new JLabel("1");
+		numberQueueLabel.setToolTipText("<html>" 
+											+ "Numbers waiting to be inputted will appear here");
 
 		// Add the buttons to it
+		add(freezeButton);
 		add(lockButton);
-		add(calculateButton);
 		add(clearVertexNumbersButton);
 		add(clearButton);
 		add(nextNumberLabel);
 		add(numberQueueLabel);
 	}
 	
+	/*
+	 * Updates the list of numbers that appear on screen to the most recent list
+	 * of available numbers.
+	 */
 	public static void updateNumberQueueLabel() {
 		String newText = "";
-		Stack<Integer> tempStack = Vertex.getNumberQueue();
-		int tempStackSize = tempStack.size();
-		for (int i = 0; i < tempStackSize - 1; i++) {
-			newText += tempStack.pop() + ", ";
+		for (Integer number : Vertex.getNumberSet()) {
+			newText += number + ", ";
 		}
-		newText += tempStack.pop();
-		numberQueueLabel.setText(newText);
+		numberQueueLabel.setText(newText.substring(0, newText.length()-2));
 	}
 	
+	/*
+	 * Displays the sum of all Faces that have at least one numbered Vertex
+	 */
 	public static void calculateFaces() {
 		for (Face f : MainFrame.faceArray) {
-			if (f != null) {
+			if (f != null && !f.isFrozen() && f.getSum() > 0) {
 				f.setText("" + f.getSum());
 			}
 		}

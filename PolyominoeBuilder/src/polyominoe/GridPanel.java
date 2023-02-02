@@ -40,7 +40,7 @@ public class GridPanel extends JLayeredPane {
 					Point point = e.getPoint();
 					int x = (int) (point.getX()/cellWidth);
 					int y = (int) (point.getY()/cellWidth);
-					if (x < gridWidth && y < gridWidth && x > 0 && y > 0) {
+					if (!hasFrozenAdjacentFaces(x, y) && x < gridWidth && y < gridWidth && x > 0 && y > 0) {
 						Face face = new Face(x, y, grid);
 
 						add(face, JLayeredPane.DEFAULT_LAYER);
@@ -95,6 +95,41 @@ public class GridPanel extends JLayeredPane {
 			add(v, JLayeredPane.PALETTE_LAYER);
 		}
 		face.setV3(v);
+	}
+	
+	/*
+	 * Returns true if there are any frozen adjacent Faces around the given
+	 * grid coordinates. (A frozen Face also has 4 frozen Vertices), thus this 
+	 * method checks for adjacent frozen Vertices.
+	 */
+	private boolean hasFrozenAdjacentFaces(int x, int y) {
+		Vertex v;
+
+		// Determine if Vertex at face's top-left is frozen
+		v = MainFrame.vertexArray[x + y*gridWidth];
+		if (v != null && v.isFrozen()) {
+			return true;
+		}
+
+		// Determine if Vertex at face's top-right is frozen
+		v = MainFrame.vertexArray[(x+1) + y*gridWidth];
+		if (v != null && v.isFrozen()) {
+			return true;
+		}
+
+		// Determine if Vertex at face's bottom-right is frozen
+		v = MainFrame.vertexArray[(x+1) + (y+1)*gridWidth];
+		if (v != null && v.isFrozen()) {
+			return true;
+		}
+
+		// Determine if Vertex at face's bottom-left is frozen
+		v = MainFrame.vertexArray[x + (y+1)*gridWidth];
+		if (v != null && v.isFrozen()) {
+			return true;
+		}
+		
+		return false;
 	}
 
 	/*
@@ -172,7 +207,7 @@ public class GridPanel extends JLayeredPane {
 	 */
 	public void clearVertexNumbers() {
 		for (Vertex v : MainFrame.vertexArray) {
-			if (v != null) {
+			if (v != null && !v.isFrozen()) {
 				v.setText("");
 				v.setValue(0);
 			}
@@ -188,7 +223,7 @@ public class GridPanel extends JLayeredPane {
 	 */
 	public void clearFaceNumbers() {
 		for (Face f : MainFrame.faceArray) {
-			if (f != null) {
+			if (f != null && !f.isFrozen()) {
 				f.setText("");
 			}
 		}

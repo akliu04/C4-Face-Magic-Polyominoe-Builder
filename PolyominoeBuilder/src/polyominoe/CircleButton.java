@@ -16,6 +16,8 @@ public class CircleButton extends JButton {
 	private Color colorNormal;
 	private Color colorHighlight;
 	private Color colorPressed;
+	
+	private boolean isLocked;
 
 
 	public CircleButton(String label) {
@@ -24,6 +26,8 @@ public class CircleButton extends JButton {
 		colorNormal = Color.white;
 		colorHighlight = Color.gray;
 		colorPressed = colorHighlight.darker();
+		
+		isLocked = false;
 
 		setBackground(colorNormal);
 		setFocusable(false);
@@ -83,6 +87,10 @@ public class CircleButton extends JButton {
 	
 	public void setColorPressed(Color c) {
 		colorPressed = c;
+	}
+	
+	public void disableRolloverHighlight() {
+		isLocked = true;
 	}
 
 }

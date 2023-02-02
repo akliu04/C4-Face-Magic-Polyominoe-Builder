@@ -27,6 +27,9 @@ public class Face extends JButton {
 	// Colors
 	private Color colorNormal = Color.white;
 	private Color colorHighlight = new Color(200, 229, 247);
+	
+	// Boolean determines whether or not this Face is interactable
+	private boolean isFrozen;
 
 	private GridPanel parentGrid;
 
@@ -43,11 +46,13 @@ public class Face extends JButton {
 		yGridLoc = y;
 		xAbsLoc = x*width;
 		yAbsLoc = y*width;
+		
 		setFocusable(false);
 		setFont(new Font("Arial", Font.PLAIN, width / 4));
 		setBackground(colorNormal);
 		setSize(width, width);
 		setLocation(xAbsLoc, yAbsLoc);
+		isFrozen = false;
 
 		setRolloverEnabled(false);
 
@@ -62,15 +67,19 @@ public class Face extends JButton {
 		addMouseListener(new java.awt.event.MouseAdapter() {
 			// Highlight the Face when mouse hovers over
 			public void mouseEntered(java.awt.event.MouseEvent evt) {
-				setBackground(colorHighlight);
+				if (!isFrozen) {
+					setBackground(colorHighlight);
+				}
 			}
 			public void mouseExited(java.awt.event.MouseEvent evt) {
-				setBackground(colorNormal);
+				if (!isFrozen) {
+					setBackground(colorNormal);
+				}
 			}
 
 			// Remove Face when clicked only if none of its vertices are labeled
 			public void mousePressed(java.awt.event.MouseEvent evt) {
-				if (!parentGrid.isLocked() && !hasLabeledVertices()) {
+				if (!isFrozen && !parentGrid.isLocked() && !hasLabeledVertices()) {
 					parentGrid.removeFace((Face) evt.getSource());
 				}
 			}
@@ -144,5 +153,22 @@ public class Face extends JButton {
 	
 	private boolean hasLabeledVertices() {
 		return v0.getValue() != 0 || v1.getValue() != 0 || v2.getValue() != 0 || v3.getValue() != 0;
+	}
+	
+	public boolean isFrozen() {
+		return isFrozen;
+	}
+	
+	
+	/*
+	 * Locks Face and its Vertices
+	 */
+	public void setLockedTrue() {
+		isFrozen = true;
+		setEnabled(false);
+		v0.setLockedTrue();
+		v1.setLockedTrue();
+		v2.setLockedTrue();
+		v3.setLockedTrue();
 	}
 }
