@@ -150,8 +150,12 @@ public class ButtonPanel extends JPanel{
 	 */
 	public static void calculateFaces() {
 		for (Face f : MainFrame.faceArray) {
-			if (f != null && !f.isFrozen() && f.getSum() > 0) {
-				f.setText("" + f.getSum());
+			if (f != null && !f.isFrozen()) {
+				if (f.getSum() != 0) {
+					f.setText("" + f.getSum());
+				} else {
+					f.setText("");
+				}
 			}
 		}
 	}
