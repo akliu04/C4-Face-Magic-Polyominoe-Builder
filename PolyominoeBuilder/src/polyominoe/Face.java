@@ -2,6 +2,7 @@ package polyominoe;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JButton;
+import javax.swing.SwingUtilities;
 
 public class Face extends JButton {
 	// The Face's four vertices. v0 corresponds to Face's top-left and proceed clockwise
@@ -25,12 +26,13 @@ public class Face extends JButton {
 	private int yGridLoc;
 
 	// Colors
-	private Color colorNormal = Color.white;
+	private Color colorNormal = Color.WHITE;
 	private Color colorHighlight = new Color(200, 229, 247);
-	
+
 	// Boolean determines whether or not this Face is interactable
 	private boolean isFrozen;
 
+	// A reference to the GridPanel on which this Face resides on. Used for removing itself off of parentGrid.
 	private GridPanel parentGrid;
 
 
@@ -46,7 +48,7 @@ public class Face extends JButton {
 		yGridLoc = y;
 		xAbsLoc = x*width;
 		yAbsLoc = y*width;
-		
+
 		setFocusable(false);
 		setFont(new Font("Arial", Font.PLAIN, width / 4));
 		setBackground(colorNormal);
@@ -57,34 +59,53 @@ public class Face extends JButton {
 		setRolloverEnabled(false);
 
 		mouseBehavior();
+		eraserBehavior();
 	}
 
 	/*
-	 * Enables hover highlight and removing the Face when the mouse 
-	 * is initially pressed on the Face.
+	 * Enables behavior for deleting Faces. When clicked on with any mouse button
+	 * or dragged over with right-click (similar to an eraser tool), the Face will
+	 * be removed.
+	 * 
+	 * Also enables hover highlight.
 	 */
 	private void mouseBehavior() {
+		// Highlight the Face when mouse hovers over
 		addMouseListener(new java.awt.event.MouseAdapter() {
-			// Highlight the Face when mouse hovers over
-			public void mouseEntered(java.awt.event.MouseEvent evt) {
+			public void mouseEntered(java.awt.event.MouseEvent e) {
 				if (!isFrozen) {
 					setBackground(colorHighlight);
 				}
 			}
-			public void mouseExited(java.awt.event.MouseEvent evt) {
+			public void mouseExited(java.awt.event.MouseEvent e) {
 				if (!isFrozen) {
 					setBackground(colorNormal);
 				}
 			}
+		});
+	}
 
-			// Remove Face when clicked only if none of its vertices are labeled
-			public void mousePressed(java.awt.event.MouseEvent evt) {
+	/*
+	 * Enables behavior for deleting Faces. When clicked on with any mouse button
+	 * or dragged over with right-click (similar to an eraser tool), the Face will
+	 * be removed.
+	 */
+	private void eraserBehavior() {
+		addMouseListener(new java.awt.event.MouseAdapter() {
+			// Remove Face when clicked (both left or right click) only if none of its vertices are labeled
+			public void mousePressed(java.awt.event.MouseEvent e) {
 				if (!isFrozen && !parentGrid.isLocked() && !hasLabeledVertices()) {
-					parentGrid.removeFace((Face) evt.getSource());
+					parentGrid.removeFace((Face) e.getSource());
 				}
 			}
-
+			// Remove Face when dragged over (right-click) only if none of its vertices are labeled
+			public void mouseEntered(java.awt.event.MouseEvent e) {
+				if (SwingUtilities.isRightMouseButton(e) && !isFrozen && !parentGrid.isLocked() && !hasLabeledVertices()) {
+					parentGrid.removeFace((Face) e.getSource());
+				}
+			}
 		});
+
 	}
 
 
@@ -146,20 +167,36 @@ public class Face extends JButton {
 		v3 = v;
 	}
 
+	/*
+	 * Returns the sum of all vertices
+	 */
 	public int getSum() {
 		sum = v0.getValue() + v1.getValue() + v2.getValue() + v3.getValue();
 		return sum;
 	}
-	
-	private boolean hasLabeledVertices() {
+
+	/*
+	 * Returns whether or not this Face has at least one Vertex that is labeled
+	 */
+	public boolean hasLabeledVertices() {
 		return v0.getValue() != 0 || v1.getValue() != 0 || v2.getValue() != 0 || v3.getValue() != 0;
 	}
-	
+
+	/*
+	 * Returns whether or not this Face has ALL Vertexes labeled
+	 */
+	public boolean hasAllLabeledVertices() {
+		return v0.getValue() != 0 && v1.getValue() != 0 && v2.getValue() != 0 && v3.getValue() != 0;
+	}
+
+	/*
+	 * Whether or not this Face is frozen (ie should not be interacted with)
+	 */
 	public boolean isFrozen() {
 		return isFrozen;
 	}
-	
-	
+
+
 	/*
 	 * Locks Face and its Vertices
 	 */

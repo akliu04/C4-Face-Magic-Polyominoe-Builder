@@ -1,14 +1,26 @@
 package polyominoe;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 
 public class MainFrame extends JFrame {
-	private final String APP_NAME = "Polyominoe Builder";				// Name of application
-	private final static int FRAME_WIDTH = 2000;						// Width of window in pixels
-	private final static int FRAME_HEIGHT = 1500;						// Height of window in pixels
+	private final String APP_NAME = "Polyominoe Builder";	// Name of application
+	private final static int USER_SCREEN_WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+	private final static int USER_SCREEN_HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+	private final static int FRAME_WIDTH = USER_SCREEN_WIDTH;						// Width of window in pixels
+	private final static int FRAME_HEIGHT = USER_SCREEN_HEIGHT;						// Height of window in pixels
+	
+	private final static int SANDBOX_SPACE = USER_SCREEN_WIDTH * 3;
+	
+	protected static int cellWidth = FRAME_WIDTH / 25;								// FRAME_WIDTH / gridWidth by default
 	
 	/*
 	 * Creates a gridWidth * gridWidth grid of cells, with the 
@@ -16,11 +28,17 @@ public class MainFrame extends JFrame {
 	 * effectively enables (gridWidth-1) * (gridWidth-1) clickable
 	 * Faces
 	 */
-	private static int gridWidth = 31;									
+	private static int gridWidth = 75 + 1;
 	
-	protected static int cellWidth = 100;								// FRAME_WIDTH / gridWidth by default
-	
+	/*
+	 * Color of the area on which the user draws Faces
+	 */
 	private final Color GRID_PANEL_COLOR = new Color(210, 210, 210);
+	
+	/*
+	 * A Scroll Pane that enables scrolling behavior for grid_panel
+	 */
+	static JScrollPane scroll_panel;
 	
 	/*
 	 * A Layered Pane that contains instances Faces and Vertex. Faces reside
@@ -58,15 +76,23 @@ public class MainFrame extends JFrame {
 		setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
 		setResizable(true);
-
-		// Create a grid_panel for enabling Face and Vertex behavior
+		
+		// Create a grid_panel which will contain Face and Vertex 
 		grid_panel = new GridPanel(gridWidth, cellWidth, GRID_PANEL_COLOR);
+		grid_panel.setPreferredSize(new Dimension(SANDBOX_SPACE,SANDBOX_SPACE));
+		
+		
+		// Create a scroll_panel that contains grid_panel, which enables user scrolling behavior for grid_panel
+		scroll_panel = new JScrollPane(grid_panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scroll_panel.getVerticalScrollBar().setUnitIncrement(FRAME_HEIGHT / 10);
+		scroll_panel.getHorizontalScrollBar().setUnitIncrement(FRAME_WIDTH / 15);
 		
 		// Create a ButtonPanel that contains all UI buttons 
 		button_panel = new ButtonPanel((GridPanel) grid_panel);
+		button_panel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 		
-		// Add the grid_panel to the center of the MainFrame and the button_panel to the top
-		add(grid_panel, BorderLayout.CENTER);
+		// Add the scroll_panel (which contains grid_panel) to the center of the MainFrame and the button_panel to the top of the window
+		add(scroll_panel, BorderLayout.CENTER);
 		add(button_panel, BorderLayout.PAGE_START);
 	}
 }

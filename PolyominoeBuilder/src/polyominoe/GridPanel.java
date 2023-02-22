@@ -6,9 +6,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JLayeredPane;
+import javax.swing.SwingUtilities;
 
 public class GridPanel extends JLayeredPane {
 	private int gridWidth;
+	
+	/*
+	 * A reference to GridPanel used for enabling drawing/erasing
+	 * Faces and Vertices off of the GridPanel
+	 */
+	private GridPanel grid;
 
 	/*
 	 * Determines whether adding/removing Faces is allowed. Allowed when true,
@@ -24,7 +31,7 @@ public class GridPanel extends JLayeredPane {
 	 */
 	public GridPanel(int gridWidth, int cellWidth, Color panelColor) {
 		this.gridWidth = gridWidth;
-		GridPanel grid = this;
+		grid = this;
 		locked = false;
 
 		// Create the grid_panel and add mouse behavior for adding Faces to the grid
@@ -35,25 +42,55 @@ public class GridPanel extends JLayeredPane {
 		// Get the mouse location using position relative to grid_panel (0,0)
 		addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				// Draw a Face and Vertices where the user clicked
-				if (!locked) {
-					Point point = e.getPoint();
-					int x = (int) (point.getX()/cellWidth);
-					int y = (int) (point.getY()/cellWidth);
-					if (!hasFrozenAdjacentFaces(x, y) && x < gridWidth && y < gridWidth && x > 0 && y > 0) {
-						Face face = new Face(x, y, grid);
-
-						add(face, JLayeredPane.DEFAULT_LAYER);
-						MainFrame.faceArray[x + y*gridWidth] = face;
-						drawVertices(face);
-					}
-				}
+				// Draw a Face where the user left-clicked
+				Point point = e.getPoint();
+				int x = (int) (point.getX()/cellWidth);
+				int y = (int) (point.getY()/cellWidth);
+				drawFace(e, x, y);
+			}
+		});
+		
+		addMouseMotionListener(new MouseAdapter() {
+			public void mouseDragged(MouseEvent e) {
+				// Draw a Face wherever the user drags their mouse (left-click)
+				Point point = e.getPoint();
+				int x = (int) (point.getX()/cellWidth);
+				int y = (int) (point.getY()/cellWidth);
+				drawFace(e, x, y);
 			}
 		});
 	}
+	
+	/*
+	 * Helper method to draw a Face at grid coordinates (x,y).
+	 * Only draws a Face on left-click
+	 */
+	private void drawFace(MouseEvent e, int x, int y) {
+		// If a Face does not already exist at the specified location and the grid is not locked
+		if (MainFrame.faceArray[x + y*gridWidth] == null && !locked) {
+			// Draw a Face if input was left-click, there are no adjacent frozen Faces that shouldn't be interacted with, and location is within bounds
+			if (SwingUtilities.isLeftMouseButton(e) && !hasFrozenAdjacentFaces(x, y) && x < gridWidth-1 && y < gridWidth-1 && x > 0 && y > 0) {
+				// Create a new Face that belongs to the (x,y) grid coordinate
+				Face face = new Face(x, y, grid);
+
+				// Add face to the bottom-most layer of grid_panel 
+				add(face, JLayeredPane.DEFAULT_LAYER);
+				// Store face in the faceArray
+				MainFrame.faceArray[x + y*gridWidth] = face;
+				// Draw Vertices onto the Face
+				drawVertices(face);
+				// If face shares a labeled Vertex with a pre-existing Face, update face's label
+				if (face.getSum() != 0) {
+					face.setText("" + face.getSum());
+				}
+			}
+			// Revalidate the scroll_panel
+			MainFrame.scroll_panel.revalidate();
+		}
+	}
 
 	/*
-	 * Draw Vertices around a Face wherever it cannot share a Vertex with another already existing Face.
+	 * Helper method to draw Vertices around a Face wherever it cannot share a Vertex with another already existing Face.
 	 */
 	public void drawVertices(Face face) {
 		Vertex v;
@@ -96,7 +133,7 @@ public class GridPanel extends JLayeredPane {
 		}
 		face.setV3(v);
 	}
-	
+
 	/*
 	 * Returns true if there are any frozen adjacent Faces around the given
 	 * grid coordinates. (A frozen Face also has 4 frozen Vertices), thus this 
@@ -128,7 +165,7 @@ public class GridPanel extends JLayeredPane {
 		if (v != null && v.isFrozen()) {
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -187,7 +224,7 @@ public class GridPanel extends JLayeredPane {
 			MainFrame.vertexArray[x + (y+1)*gridWidth] = null;
 		}
 	}
-	
+
 	/*
 	 * Remove all Faces and Vertices off the screen. Also resets
 	 * all numbering of Vertices and Vertex/Face arrays. 
@@ -217,7 +254,7 @@ public class GridPanel extends JLayeredPane {
 		revalidate();
 		repaint();
 	}
-	
+
 	/*
 	 * Clears all Face values.
 	 */
@@ -228,7 +265,7 @@ public class GridPanel extends JLayeredPane {
 			}
 		}
 	}
-	
+
 	/*
 	 * Returns whether or not the grid is locked from
 	 * adding or removing Faces.
@@ -240,7 +277,7 @@ public class GridPanel extends JLayeredPane {
 	public void setLockedTrue() {
 		locked = true;
 	}
-	
+
 	public void setLockedFalse() {
 		locked = false;
 	}
