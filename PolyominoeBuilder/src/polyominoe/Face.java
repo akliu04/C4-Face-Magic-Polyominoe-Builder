@@ -43,7 +43,7 @@ public class Face extends JButton {
 	public Face(int x, int y, GridPanel parentGrid) {
 		super();
 		this.parentGrid = parentGrid;
-		width = MainFrame.cellWidth;
+		width = parentGrid.getCellWidth();
 		xGridLoc = x;
 		yGridLoc = y;
 		xAbsLoc = x*width;
@@ -200,12 +200,12 @@ public class Face extends JButton {
 	/*
 	 * Locks Face and its Vertices
 	 */
-	public void setLockedTrue() {
+	public void setFrozenTrue() {
 		isFrozen = true;
 		setEnabled(false);
-		v0.setLockedTrue();
-		v1.setLockedTrue();
-		v2.setLockedTrue();
-		v3.setLockedTrue();
+		v0.setFrozenTrue();
+		v1.setFrozenTrue();
+		v2.setFrozenTrue();
+		v3.setFrozenTrue();
 	}
 }

@@ -3,12 +3,11 @@ package polyominoe;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Stack;
 import java.util.TreeSet;
 
 public class Vertex extends CircleButton{
 	/*
-	 * The number a Vertex will take on when clicked. 
+	 * The number the next labelled Vertex will take on. 
 	 */
 	private static int nextInt = 1;
 
@@ -16,7 +15,10 @@ public class Vertex extends CircleButton{
 	 * The queued numbers waiting to be inputed into vertices.
 	 */
 	private static TreeSet<Integer> numberSet = new TreeSet<Integer>();
-
+	
+	/*
+	 * This Vertex's label value.
+	 */
 	private int value;
 	
 	/*
@@ -32,7 +34,7 @@ public class Vertex extends CircleButton{
 	 */
 	public Vertex(int radius) {
 		super("");
-		setFont(new Font("Arial", Font.PLAIN, radius / 3));
+		setFont(new Font("Arial", Font.PLAIN, (int) (radius / 3)));
 		setSize(radius, radius);
 		isFrozen = false;
 
@@ -45,26 +47,39 @@ public class Vertex extends CircleButton{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!isFrozen) {
-					// If Vertex is empty, assign it the smallest number in numberSet
+					// If Vertex is not labeled, label it the smallest number in numberSet when clicked
 					if (value == 0) {
 						setValue(numberSet.first());
 						setText("" + numberSet.first());
 
 						numberSet.remove(numberSet.first());
-					} else {
-						// Otherwise, remove the number from Vertex and add it to the numberSet
+					} else { // Vertex must already be labeled, so delete labeling when clicked
+						// Remove the number from Vertex and add it to the numberSet
 						numberSet.add(getValue());
 						setValue(0);
 						setText("");
 					}
+					// If all queued numbers in numberSet have been used up, increment nextInt and store it in numberSet
 					if (numberSet.isEmpty()) {
 						numberSet.add(++nextInt);
 					}
+					// Recalculate the Faces and update the visual labelings
 					ButtonPanel.calculateFaces();
 					ButtonPanel.updateNumberQueueLabel();
 				}
 			}
 		});
+	}
+	
+	/*
+	 * Helper method to reset the counter and empty the numberSet.
+	 * Used to clear all labelings on screen.
+	 */
+	public static void resetCounter() {
+		nextInt = 1;
+		numberSet = new TreeSet<Integer>();
+		numberSet.add(nextInt);
+		ButtonPanel.updateNumberQueueLabel();
 	}
 
 	public int getValue() {
@@ -74,19 +89,12 @@ public class Vertex extends CircleButton{
 	public void setValue(int value) {
 		this.value = value;
 	}
-
-	public static void resetCounter() {
-		nextInt = 1;
-		numberSet = new TreeSet<Integer>();
-		numberSet.add(nextInt);
-		ButtonPanel.updateNumberQueueLabel();
-	}
 	
 	public boolean isFrozen() {
 		return isFrozen;
 	}
 	
-	public void setLockedTrue() {
+	public void setFrozenTrue() {
 		isFrozen = true;
 		setEnabled(false);
 	}

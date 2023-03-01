@@ -6,16 +6,42 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JLayeredPane;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 public class GridPanel extends JLayeredPane {
 	private int gridWidth;
 	
 	/*
-	 * A reference to GridPanel used for enabling drawing/erasing
-	 * Faces and Vertices off of the GridPanel
+	 * A reference to GridPanel used for drawing/erasing
+	 * Faces and Vertices on GridPanel.
 	 */
 	private GridPanel grid;
+	
+	/*
+	 * Width of the Face
+	 */
+	private int cellWidth;
+	
+	/*
+	 * An array containing all Faces. Has essentially global scope for easy access.
+	 * 
+	 * To translate square-grid coordinates (x,y) to a corresponding index in faceArray, use the formula:
+	 * index = x + y*gridWidth
+	 * 
+	 * Example: A Face with coordinates (5, 3) on a 10x10 grid (whose top-left cell is (0,0)) would be placed at index 35.
+	 */
+	public static Face[] faceArray;
+	
+	/*
+	 * An array containing all Vertices. Has essentially global scope for easy access.
+	 * 
+	 * To translate square-grid coordinates (x,y) to a corresponding index in vertexArray, use the formula:
+	 * index = x + y*gridWidth
+	 * 
+	 * This array is 'overlapped' on top of faceArray for storing each Face's Vertices.
+	 */
+	public static Vertex[] vertexArray;
 
 	/*
 	 * Determines whether adding/removing Faces is allowed. Allowed when true,
@@ -29,10 +55,17 @@ public class GridPanel extends JLayeredPane {
 	 * corner of grid_panel serves as (0,0) for the purpose of creating/removing
 	 * Faces and Vertices, rather than the top-left corner of the entire window.
 	 */
-	public GridPanel(int gridWidth, int cellWidth, Color panelColor) {
-		this.gridWidth = gridWidth;
+	public GridPanel(int gridWidth, int cellWidth, JScrollPane scrollPanel, Color panelColor) {
 		grid = this;
 		locked = false;
+		this.gridWidth = gridWidth;
+		this.cellWidth = cellWidth;
+		
+		// faceArray and vertexArray are effectively 2D arrays (represented with a simply 1D array)
+		// with a one row and one column buffer on the left and right of the grid
+		// The buffer exists since Faces drawn on the edges of the window have Vertex that clip out of the window
+		faceArray = new Face[(gridWidth) * (gridWidth)];
+		vertexArray = new Vertex[(gridWidth+1) * (gridWidth+1)];
 
 		// Create the grid_panel and add mouse behavior for adding Faces to the grid
 		setBackground(panelColor);
@@ -63,11 +96,12 @@ public class GridPanel extends JLayeredPane {
 	
 	/*
 	 * Helper method to draw a Face at grid coordinates (x,y).
+	 * Calls helper method drawVertices to draw Face's Vertices.
 	 * Only draws a Face on left-click
 	 */
 	private void drawFace(MouseEvent e, int x, int y) {
 		// If a Face does not already exist at the specified location and the grid is not locked
-		if (MainFrame.faceArray[x + y*gridWidth] == null && !locked) {
+		if (faceArray[x + y*gridWidth] == null && !locked) {
 			// Draw a Face if input was left-click, there are no adjacent frozen Faces that shouldn't be interacted with, and location is within bounds
 			if (SwingUtilities.isLeftMouseButton(e) && !hasFrozenAdjacentFaces(x, y) && x < gridWidth-1 && y < gridWidth-1 && x > 0 && y > 0) {
 				// Create a new Face that belongs to the (x,y) grid coordinate
@@ -76,7 +110,7 @@ public class GridPanel extends JLayeredPane {
 				// Add face to the bottom-most layer of grid_panel 
 				add(face, JLayeredPane.DEFAULT_LAYER);
 				// Store face in the faceArray
-				MainFrame.faceArray[x + y*gridWidth] = face;
+				faceArray[x + y*gridWidth] = face;
 				// Draw Vertices onto the Face
 				drawVertices(face);
 				// If face shares a labeled Vertex with a pre-existing Face, update face's label
@@ -84,9 +118,9 @@ public class GridPanel extends JLayeredPane {
 					face.setText("" + face.getSum());
 				}
 			}
-			// Revalidate the scroll_panel
-			MainFrame.scroll_panel.revalidate();
 		}
+		repaint();
+		revalidate();
 	}
 
 	/*
@@ -98,37 +132,37 @@ public class GridPanel extends JLayeredPane {
 		int y = face.getGridY();
 
 		// Determine if Vertex at face's top-left exists already. If not, create a Vertex there.
-		v = MainFrame.vertexArray[x + y*gridWidth];
+		v = vertexArray[x + y*gridWidth];
 		if (v == null) {
 			v = face.createVertex(0);
-			MainFrame.vertexArray[x + y*gridWidth] = v;
+			vertexArray[x + y*gridWidth] = v;
 			add(v, JLayeredPane.PALETTE_LAYER);
 		}
 		face.setV0(v);
 
 		// Determine if Vertex at face's top-right exists already. If not, create a Vertex there.
-		v = MainFrame.vertexArray[(x+1) + y*gridWidth];
+		v = vertexArray[(x+1) + y*gridWidth];
 		if (v == null) {
 			v = face.createVertex(1);
-			MainFrame.vertexArray[(x+1) + y*gridWidth] = v;
+			vertexArray[(x+1) + y*gridWidth] = v;
 			add(v, JLayeredPane.PALETTE_LAYER);
 		}
 		face.setV1(v);
 
 		// Determine if Vertex at face's bottom-right exists already. If not, create a Vertex there.
-		v = MainFrame.vertexArray[(x+1) + (y+1)*gridWidth];
+		v = vertexArray[(x+1) + (y+1)*gridWidth];
 		if (v == null) {
 			v = face.createVertex(2);
-			MainFrame.vertexArray[(x+1) + (y+1)*gridWidth] = v;
+			vertexArray[(x+1) + (y+1)*gridWidth] = v;
 			add(v, JLayeredPane.PALETTE_LAYER);
 		}
 		face.setV2(v);
 
 		// Determine if Vertex at face's bottom-left exists already. If not, create a Vertex there.
-		v = MainFrame.vertexArray[x + (y+1)*gridWidth];
+		v = vertexArray[x + (y+1)*gridWidth];
 		if (v == null) {
 			v = face.createVertex(3);
-			MainFrame.vertexArray[x + (y+1)*gridWidth] = v;
+			vertexArray[x + (y+1)*gridWidth] = v;
 			add(v, JLayeredPane.PALETTE_LAYER);
 		}
 		face.setV3(v);
@@ -143,25 +177,25 @@ public class GridPanel extends JLayeredPane {
 		Vertex v;
 
 		// Determine if Vertex at face's top-left is frozen
-		v = MainFrame.vertexArray[x + y*gridWidth];
+		v = vertexArray[x + y*gridWidth];
 		if (v != null && v.isFrozen()) {
 			return true;
 		}
 
 		// Determine if Vertex at face's top-right is frozen
-		v = MainFrame.vertexArray[(x+1) + y*gridWidth];
+		v = vertexArray[(x+1) + y*gridWidth];
 		if (v != null && v.isFrozen()) {
 			return true;
 		}
 
 		// Determine if Vertex at face's bottom-right is frozen
-		v = MainFrame.vertexArray[(x+1) + (y+1)*gridWidth];
+		v = vertexArray[(x+1) + (y+1)*gridWidth];
 		if (v != null && v.isFrozen()) {
 			return true;
 		}
 
 		// Determine if Vertex at face's bottom-left is frozen
-		v = MainFrame.vertexArray[x + (y+1)*gridWidth];
+		v = vertexArray[x + (y+1)*gridWidth];
 		if (v != null && v.isFrozen()) {
 			return true;
 		}
@@ -176,7 +210,7 @@ public class GridPanel extends JLayeredPane {
 	public void removeFace(Face f) {
 		removeVertices(f);
 		remove(f);
-		MainFrame.faceArray[f.getGridX() + f.getGridY()*gridWidth] = null;
+		faceArray[f.getGridX() + f.getGridY()*gridWidth] = null;
 
 		revalidate();
 		repaint();
@@ -191,37 +225,37 @@ public class GridPanel extends JLayeredPane {
 		int y = f.getGridY();
 
 		// Booleans determining whether an adjacent Face exists. f0 corresponds to top-left and proceeds clockwise around Face f.
-		boolean f0 = MainFrame.faceArray[(x-1) + (y-1)*gridWidth] == null;
-		boolean f1 = MainFrame.faceArray[x + (y-1)*gridWidth] == null;
-		boolean f2 = MainFrame.faceArray[(x+1) + (y-1)*gridWidth] == null;
-		boolean f3 = MainFrame.faceArray[(x+1) + y*gridWidth] == null;
-		boolean f4 = MainFrame.faceArray[(x+1) + (y+1)*gridWidth] == null;
-		boolean f5 = MainFrame.faceArray[x + (y+1)*gridWidth] == null;
-		boolean f6 = MainFrame.faceArray[(x-1) + (y+1)*gridWidth] == null;
-		boolean f7 = MainFrame.faceArray[(x-1) + y*gridWidth] == null;
+		boolean f0 = faceArray[(x-1) + (y-1)*gridWidth] == null;
+		boolean f1 = faceArray[x + (y-1)*gridWidth] == null;
+		boolean f2 = faceArray[(x+1) + (y-1)*gridWidth] == null;
+		boolean f3 = faceArray[(x+1) + y*gridWidth] == null;
+		boolean f4 = faceArray[(x+1) + (y+1)*gridWidth] == null;
+		boolean f5 = faceArray[x + (y+1)*gridWidth] == null;
+		boolean f6 = faceArray[(x-1) + (y+1)*gridWidth] == null;
+		boolean f7 = faceArray[(x-1) + y*gridWidth] == null;
 
 		// Check top-left Vertex
 		if (f0 && f1 && f7) {
-			remove(MainFrame.vertexArray[x + y*gridWidth]);
-			MainFrame.vertexArray[x + y*gridWidth] = null;
+			remove(vertexArray[x + y*gridWidth]);
+			vertexArray[x + y*gridWidth] = null;
 		}
 
 		// Check top-right Vertex
 		if (f1 && f2 && f3) {
-			remove(MainFrame.vertexArray[(x+1) + y*gridWidth]);
-			MainFrame.vertexArray[(x+1) + y*gridWidth] = null;
+			remove(vertexArray[(x+1) + y*gridWidth]);
+			vertexArray[(x+1) + y*gridWidth] = null;
 		}
 
 		// Check bottom-right Vertex
 		if (f3 && f4 && f5) {
-			remove(MainFrame.vertexArray[(x+1) + (y+1)*gridWidth]);
-			MainFrame.vertexArray[(x+1) + (y+1)*gridWidth] = null;
+			remove(vertexArray[(x+1) + (y+1)*gridWidth]);
+			vertexArray[(x+1) + (y+1)*gridWidth] = null;
 		}
 
 		// Check bottom-left Vertex
 		if (f5 && f6 && f7) {
-			remove(MainFrame.vertexArray[x + (y+1)*gridWidth]);
-			MainFrame.vertexArray[x + (y+1)*gridWidth] = null;
+			remove(vertexArray[x + (y+1)*gridWidth]);
+			vertexArray[x + (y+1)*gridWidth] = null;
 		}
 	}
 
@@ -230,8 +264,8 @@ public class GridPanel extends JLayeredPane {
 	 * all numbering of Vertices and Vertex/Face arrays. 
 	 */
 	public void clearGrid() {
-		MainFrame.faceArray = new Face[MainFrame.faceArray.length];
-		MainFrame.vertexArray = new Vertex[MainFrame.vertexArray.length];
+		faceArray = new Face[faceArray.length];
+		vertexArray = new Vertex[vertexArray.length];
 		removeAll();
 		Vertex.resetCounter();
 		revalidate();
@@ -243,7 +277,7 @@ public class GridPanel extends JLayeredPane {
 	 * Faces.
 	 */
 	public void clearVertexNumbers() {
-		for (Vertex v : MainFrame.vertexArray) {
+		for (Vertex v : vertexArray) {
 			if (v != null && !v.isFrozen()) {
 				v.setText("");
 				v.setValue(0);
@@ -259,7 +293,7 @@ public class GridPanel extends JLayeredPane {
 	 * Clears all Face values.
 	 */
 	public void clearFaceNumbers() {
-		for (Face f : MainFrame.faceArray) {
+		for (Face f : faceArray) {
 			if (f != null && !f.isFrozen()) {
 				f.setText("");
 			}
@@ -273,13 +307,28 @@ public class GridPanel extends JLayeredPane {
 	public boolean isLocked() {
 		return locked;
 	}
-
+	
+	/*
+	 * Returns cellWidth, which is how wide each Face should be.
+	 */
+	public int getCellWidth() {
+		return cellWidth;
+	}
+	
 	public void setLockedTrue() {
 		locked = true;
 	}
 
 	public void setLockedFalse() {
 		locked = false;
+	}
+	
+	public Face[] getFaceArray() {
+		return faceArray;
+	}
+	
+	public Vertex[] getVertexArray() {
+		return vertexArray;
 	}
 
 }

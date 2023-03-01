@@ -12,59 +12,50 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 
 public class MainFrame extends JFrame {
-	private final String APP_NAME = "Polyominoe Builder";	// Name of application
-	private final static int USER_SCREEN_WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-	private final static int USER_SCREEN_HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
-	private final static int FRAME_WIDTH = USER_SCREEN_WIDTH;						// Width of window in pixels
-	private final static int FRAME_HEIGHT = USER_SCREEN_HEIGHT;						// Height of window in pixels
-	
-	private final static int SANDBOX_SPACE = USER_SCREEN_WIDTH * 3;
-	
-	protected static int cellWidth = FRAME_WIDTH / 25;								// FRAME_WIDTH / gridWidth by default
-	
+	private final String APP_NAME = "Polyominoe Builder";					// Name of application
+	private final int USER_SCREEN_WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+	private final int USER_SCREEN_HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+	private final int FRAME_WIDTH = USER_SCREEN_WIDTH;						// Width of window in pixels
+	private final int FRAME_HEIGHT = USER_SCREEN_HEIGHT;						// Height of window in pixels
+
+	private final int SANDBOX_SPACE = USER_SCREEN_WIDTH * 3;
+
+	protected int cellWidth = FRAME_WIDTH / 25;								// FRAME_WIDTH / gridWidth by default
+
 	/*
 	 * Creates a gridWidth * gridWidth grid of cells, with the 
 	 * left column and top row of cells acting as an empty. This 
 	 * effectively enables (gridWidth-1) * (gridWidth-1) clickable
 	 * Faces
 	 */
-	private static int gridWidth = 75 + 1;
-	
+	private int gridWidth = 75 + 1;
+
 	/*
 	 * Color of the area on which the user draws Faces
 	 */
 	private final Color GRID_PANEL_COLOR = new Color(210, 210, 210);
-	
+
 	/*
 	 * A Scroll Pane that enables scrolling behavior for grid_panel
 	 */
-	static JScrollPane scroll_panel;
-	
+	private JScrollPane scroll_panel;
+
 	/*
 	 * A Layered Pane that contains instances Faces and Vertex. Faces reside
 	 * on the bottom-most layer and Vertexes lay above Faces. The top-left
 	 * corner of grid_panel serves as (0,0) for the purpose of creating/removing
 	 * Faces and Vertices, rather than the top-left corner of the entire window.
 	 */
-	static JLayeredPane grid_panel;
-	
-	/*
-	 * A JPanel that contains the UI buttons. Uses a FlowLayout for storing buttons.
-	 */
-	static ButtonPanel button_panel;
-	
-	/*
-	 * An array containing all Faces.
-	 */
-	static Face[] faceArray = new Face[(gridWidth+1) * (gridWidth+1)];
-	
-	/*
-	 * An array containing all Vertices.
-	 */
-	static Vertex[] vertexArray = new Vertex[(gridWidth+1) * (gridWidth+1)];
+	private JLayeredPane grid_panel;
 
-	
-	
+	/*
+	 * A JPanel that contains the UI buttons and displays useful information to the user. 
+	 * Uses a FlowLayout for storing buttons.
+	 */
+	private ButtonPanel button_panel;
+
+
+
 	/**
 	 * Create the frame.
 	 */
@@ -76,23 +67,23 @@ public class MainFrame extends JFrame {
 		setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
 		setResizable(true);
-		
+
 		// Create a grid_panel which will contain Face and Vertex 
-		grid_panel = new GridPanel(gridWidth, cellWidth, GRID_PANEL_COLOR);
+		grid_panel = new GridPanel(gridWidth, cellWidth, scroll_panel, GRID_PANEL_COLOR);
 		grid_panel.setPreferredSize(new Dimension(SANDBOX_SPACE,SANDBOX_SPACE));
-		
-		
+
 		// Create a scroll_panel that contains grid_panel, which enables user scrolling behavior for grid_panel
 		scroll_panel = new JScrollPane(grid_panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scroll_panel.getVerticalScrollBar().setUnitIncrement(FRAME_HEIGHT / 10);
 		scroll_panel.getHorizontalScrollBar().setUnitIncrement(FRAME_WIDTH / 15);
-		
+
 		// Create a ButtonPanel that contains all UI buttons 
 		button_panel = new ButtonPanel((GridPanel) grid_panel);
 		button_panel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-		
+
 		// Add the scroll_panel (which contains grid_panel) to the center of the MainFrame and the button_panel to the top of the window
 		add(scroll_panel, BorderLayout.CENTER);
 		add(button_panel, BorderLayout.PAGE_START);
 	}
+
 }
