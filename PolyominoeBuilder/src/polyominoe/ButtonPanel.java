@@ -52,6 +52,11 @@ public class ButtonPanel extends JPanel{
 	 * A Label that displays the queued numbers available to be inputed into Vertices.
 	 */
 	private static JLabel numberQueueLabel;
+	
+	/*
+	 * A Button that calculates EVERY permutation of Vertex labellings.
+	 */
+	private static JButton testAllPermutationsButton;
 
 
 	/*
@@ -145,8 +150,30 @@ public class ButtonPanel extends JPanel{
 		numberQueueLabel = new JLabel("1");
 		numberQueueLabel.setToolTipText("<html>" 
 				+ "Numbers waiting to be inputted will appear here");
+		
+		// Create the testAllPermutationsButton
+		testAllPermutationsButton = new JButton("Test All Labellings");
+		testAllPermutationsButton.setFocusable(false);
+		testAllPermutationsButton.setToolTipText("<html>" 
+				+ "Test all permutations of possibly labellings"
+				+ "<br>"
+				+ "WARNING: May take longer than expected; Use at your own risk...");
+		testAllPermutationsButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Copy all non-null Vertices in vertexArray to vArr for more efficient permutation generation
+				Vertex[] vArr = getNonNullLabelledCopyVertex();
+				Face[] fArr = getNonNullCopyFace();
+				PermutationGenerator permGen = new PermutationGenerator();
+				permGen.generateAllLabellings(vArr, fArr, vArr.length);
+				freezeCompleteButton.doClick();
+			}
+		});
+		
+		
 
 		// Add the buttons to it
+		add(testAllPermutationsButton);
 		add(freezeCompleteButton);
 		add(freezeAllButton);
 		add(lockButton);
@@ -181,5 +208,48 @@ public class ButtonPanel extends JPanel{
 				}
 			}
 		}
+	}
+	
+	/*
+	 * Helper method to return an array of copies of non-null values of vertexArray
+	 * with labels 1 - numVertices
+	 */
+	private Vertex[] getNonNullLabelledCopyVertex() {
+		Vertex[] vArr;
+		int length = 0;
+		int index = 0;
+		for (Vertex v : GridPanel.vertexArray) {
+			if (v != null) {
+				length++;
+			}
+		}
+		vArr = new Vertex[length];
+		for (Vertex v : GridPanel.vertexArray) {
+			if (v != null) {
+				v.setValue(index+1);
+				vArr[index++] = v;
+			}
+		}
+		return vArr;
+	}
+	/*
+	 * Helper method to return an array of copies of non-null values of faceArray
+	 */
+	private Face[] getNonNullCopyFace() {
+		Face[] fArr;
+		int length = 0;
+		int index = 0;
+		for (Face f : GridPanel.faceArray) {
+			if (f != null) {
+				length++;
+			}
+		}
+		fArr = new Face[length];
+		for (Face f : GridPanel.faceArray) {
+			if (f != null) {
+				fArr[index++] = f;
+			}
+		} 
+		return fArr;
 	}
 }

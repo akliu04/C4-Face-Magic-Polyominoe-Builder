@@ -24,11 +24,11 @@ public class MainFrame extends JFrame {
 
 	/*
 	 * Creates a gridWidth * gridWidth grid of cells, with the 
-	 * left column and top row of cells acting as an empty. This 
-	 * effectively enables (gridWidth-1) * (gridWidth-1) clickable
+	 * left/right column and top/bottom row of cells acting as empty buffer
+	 * to prevent clipping. This effectively enables (gridWidth-2) * (gridWidth-2) clickable
 	 * Faces
 	 */
-	private int gridWidth = 75 + 1;
+	private int gridWidth = 74 + 2;
 
 	/*
 	 * Color of the area on which the user draws Faces
