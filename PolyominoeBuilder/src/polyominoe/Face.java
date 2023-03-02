@@ -11,9 +11,6 @@ public class Face extends JButton {
 	private Vertex v2;
 	private Vertex v3;
 
-	// Sum of four Vertices
-	private int sum;
-
 	// Width of grid_panel in pixels
 	private int width;
 
@@ -171,8 +168,8 @@ public class Face extends JButton {
 	 * Returns the sum of all vertices
 	 */
 	public int getSum() {
-		sum = v0.getValue() + v1.getValue() + v2.getValue() + v3.getValue();
-		return sum;
+		return v0.getValue() + v1.getValue() + v2.getValue() + v3.getValue();
+
 	}
 
 	/*

@@ -162,11 +162,13 @@ public class ButtonPanel extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Copy all non-null Vertices in vertexArray to vArr for more efficient permutation generation
-				Vertex[] vArr = getNonNullLabelledCopyVertex();
-				Face[] fArr = getNonNullCopyFace();
-				PermutationGenerator permGen = new PermutationGenerator();
-				permGen.generateAllLabellings(vArr, fArr, vArr.length);
-				freezeCompleteButton.doClick();
+				Vertex[] vArr = getNonNullLabelledCopiesVertex();
+				Face[] fArr = getNonNullCopiesFace();
+				if (fArr.length != 0) {
+					PermutationGenerator permGen = new PermutationGenerator();
+					permGen.generateAllLabellings(vArr, fArr, vArr.length);
+					freezeCompleteButton.doClick(); 
+				}
 			}
 		});
 		
@@ -214,7 +216,7 @@ public class ButtonPanel extends JPanel{
 	 * Helper method to return an array of copies of non-null values of vertexArray
 	 * with labels 1 - numVertices
 	 */
-	private Vertex[] getNonNullLabelledCopyVertex() {
+	private Vertex[] getNonNullLabelledCopiesVertex() {
 		Vertex[] vArr;
 		int length = 0;
 		int index = 0;
@@ -235,7 +237,7 @@ public class ButtonPanel extends JPanel{
 	/*
 	 * Helper method to return an array of copies of non-null values of faceArray
 	 */
-	private Face[] getNonNullCopyFace() {
+	private Face[] getNonNullCopiesFace() {
 		Face[] fArr;
 		int length = 0;
 		int index = 0;
