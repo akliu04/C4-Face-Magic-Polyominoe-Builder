@@ -155,9 +155,10 @@ public class ButtonPanel extends JPanel{
 		testAllPermutationsButton = new JButton("Test All Labellings");
 		testAllPermutationsButton.setFocusable(false);
 		testAllPermutationsButton.setToolTipText("<html>" 
-				+ "Test all permutations of possibly labellings"
+				+ "Test all permutations of possible labellings"
 				+ "<br>"
-				+ "WARNING: May take longer than expected; Use at your own risk...");
+				+ "WARNING: Time to calculate all permutations is (#vertices)!"
+				+ "Ideally used for polyominoes with < 14 vertices");
 		testAllPermutationsButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

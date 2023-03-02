@@ -42,18 +42,18 @@ public class PermutationGenerator {
 					updateC4FaceMagicLabels();
 				} 
 				numPermutationsGenerated++; 
-				c[i] += 1;
+				c[i]++;
 				i = 0;
 			} else {
 				c[i] = 0;
-				i += 1;
+				i++;
 			}
 		}
 		
 		// Print out useful information to console
 		System.out.println("Done!");
 		System.out.println("Generated " + vArr.length + "! ("+ numPermutationsGenerated + ") total labellings.");
-		System.out.println("There exists " + numC4Labellings + " labellings (including symmetric labellings) for this graph.");
+		System.out.println("There exists " + numC4Labellings + " c4-face-magic labellings (including symmetric labellings) for this graph.");
 		System.out.println("All possible c4-face-magic values: " + sortedC4FaceMagicValues(c4FaceMagicValueSet));
 	}
 
