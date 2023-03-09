@@ -81,24 +81,39 @@ public class Vertex extends CircleButton{
 		numberSet.add(nextInt);
 		ButtonPanel.updateNumberQueueLabel();
 	}
-
+	
+	/*
+	 * Returns the value this Vertex holds
+	 */
 	public int getValue() {
 		return value;
 	}
 
+	/*
+	 * Set this Vertex's value to an int value
+	 */
 	public void setValue(int value) {
 		this.value = value;
 	}
 	
+	/*
+	 * Returns whether or not this Vertex is frozen (can be interacted with on screen)
+	 */
 	public boolean isFrozen() {
 		return isFrozen;
 	}
 	
+	/*
+	 * Freeze this Vertex
+	 */
 	public void setFrozenTrue() {
 		isFrozen = true;
 		setEnabled(false);
 	}
-
+	
+	/*
+	 * Getter for numberSet, which is the set of all Vertex labellings awaiting input
+	 */
 	public static TreeSet<Integer> getNumberSet(){
 		return numberSet;
 	}

@@ -139,27 +139,45 @@ public class Face extends JButton {
 		vertex.setLocation(x, y);
 		return vertex;
 	}
-
+	
+	/*
+	 * Returns the x-grid coordinate of this Face (not absolute position)
+	 */
 	public int getGridX() {
 		return xGridLoc;
 	}
-
+	
+	/*
+	 * Returns the y-grid coordinate of this Face (not absolute position)
+	 */
 	public int getGridY() {
 		return yGridLoc;
 	}
-
+	
+	/*
+	 * Set this Face's top-left Vertex value to v
+	 */
 	public void setV0(Vertex v) {
 		v0 = v;
 	}
-
+	
+	/*
+	 * Set this Face's top-right Vertex value to v
+	 */
 	public void setV1(Vertex v) {
 		v1 = v;
 	}
-
+	
+	/*
+	 * Set this Face's bottom-left Vertex value to v
+	 */
 	public void setV2(Vertex v) {
 		v2 = v;
 	}
 
+	/*
+	 * Set this Face's bottom-right Vertex value to v
+	 */
 	public void setV3(Vertex v) {
 		v3 = v;
 	}
@@ -195,7 +213,7 @@ public class Face extends JButton {
 
 
 	/*
-	 * Locks Face and its Vertices
+	 * Freezes this Face and its Vertices
 	 */
 	public void setFrozenTrue() {
 		isFrozen = true;

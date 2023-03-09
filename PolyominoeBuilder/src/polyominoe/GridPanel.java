@@ -315,18 +315,30 @@ public class GridPanel extends JLayeredPane {
 		return cellWidth;
 	}
 	
+	/*
+	 * Locks the GridPanel, preventing User from adding or deleting Faces
+	 */
 	public void setLockedTrue() {
 		locked = true;
 	}
-
+	
+	/*
+	 * Unlocks the GridPanel
+	 */
 	public void setLockedFalse() {
 		locked = false;
 	}
 	
+	/*
+	 * Getter for faceArray
+	 */
 	public Face[] getFaceArray() {
 		return faceArray;
 	}
 	
+	/*
+	 * Getter for vertexArray
+	 */
 	public Vertex[] getVertexArray() {
 		return vertexArray;
 	}

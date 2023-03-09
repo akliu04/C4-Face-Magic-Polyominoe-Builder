@@ -10,13 +10,6 @@ import javax.swing.JToggleButton;
 public class ButtonPanel extends JPanel{
 
 	/*
-	 * A Button that prevents making any changes to ALL Faces & Vertices currently on screen,
-	 * as well as resets Vertex numbering for any future Vertices. Frozen Faces and Vertices
-	 * CANNOT be unfrozen.
-	 */
-	private JButton freezeAllButton;
-
-	/*
 	 * A Button that prevents making any changes to Faces that have all their Vertices labeled,
 	 * as well as resets Vertex numbering for any future Vertices. Frozen Faces and Vertices
 	 * CANNOT be unfrozen.
@@ -63,23 +56,6 @@ public class ButtonPanel extends JPanel{
 	 * A Panel that contains the UI buttons. Uses a default FlowLayout for storing buttons.
 	 */
 	public ButtonPanel(GridPanel gridPanel) {
-		// Create the freezeButton
-		freezeAllButton = new JButton("Freeze All");
-		freezeAllButton.setFocusable(false);
-		freezeAllButton.setToolTipText("<html>" 
-				+ "Freeze all polyominoes. Cannot be undone");
-		freezeAllButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				for (Face face : GridPanel.faceArray) {
-					if (face != null) {
-						face.setFrozenTrue();
-					}
-				}
-				gridPanel.clearVertexNumbers();
-			}
-		});
-
 		// Create the freezeCompleteButton
 		freezeCompleteButton = new JButton("Freeze Labelled");
 		freezeCompleteButton.setFocusable(false);
@@ -178,7 +154,6 @@ public class ButtonPanel extends JPanel{
 		// Add the buttons to it
 		add(testAllPermutationsButton);
 		add(freezeCompleteButton);
-		add(freezeAllButton);
 		add(lockButton);
 		add(clearVertexNumbersButton);
 		add(clearButton);

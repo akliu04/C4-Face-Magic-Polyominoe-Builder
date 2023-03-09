@@ -62,7 +62,6 @@ public class PermutationGenerator {
 	 * in sorted ascending order.
 	 */
 	private String sortedC4FaceMagicValues(HashSet<Integer> set) {
-		// TODO Auto-generated method stub
 		int[] arr = new int[set.size()];
 		int i = 0;
 		for (Integer num : set) {

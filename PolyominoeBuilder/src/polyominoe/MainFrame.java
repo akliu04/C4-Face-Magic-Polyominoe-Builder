@@ -28,7 +28,7 @@ public class MainFrame extends JFrame {
 	 * to prevent clipping. This effectively enables (gridWidth-2) * (gridWidth-2) clickable
 	 * Faces
 	 */
-	private int gridWidth = 74 + 2;
+	private int gridWidth = 76;
 
 	/*
 	 * Color of the area on which the user draws Faces
@@ -57,7 +57,7 @@ public class MainFrame extends JFrame {
 
 
 	/**
-	 * Create the frame.
+	 * Create the MainFrame which contains all panels.
 	 */
 	public MainFrame()  {
 		// Create the Window
