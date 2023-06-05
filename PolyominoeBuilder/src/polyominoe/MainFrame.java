@@ -18,18 +18,34 @@ public class MainFrame extends JFrame {
 	private final int FRAME_WIDTH = USER_SCREEN_WIDTH;						// Width of window in pixels
 	private final int FRAME_HEIGHT = USER_SCREEN_HEIGHT;						// Height of window in pixels
 
-	private final int SANDBOX_SPACE = USER_SCREEN_WIDTH * 3;
-
-	protected int cellWidth = FRAME_WIDTH / 25;								// FRAME_WIDTH / gridWidth by default
+	/*
+	 * CHANGE THIS VALUE TO ADJUST THE MAXIMUM SIZE OF THE SANDBOX
+	 * 
+	 * The width and height of the grid in clickable cells (cells that are
+	 * available to the user to draw Faces). Effectively allows for a polyominoe
+	 * of maximum size of gridWidth*gridWidth Faces.
+	 */
+	private int gridWidth = 100;
+	
+	/*
+	 * Determines how many Faces can fit in a horizontal row on the user's screen
+	 */
+	private final int FACES_PER_ROW = 25;
+	
+	/*
+	 * The width of each cell on the GridPanel, ie the width of each Face.
+	 * When cellWidth = FRAME_WIDTH / 25, 25 Faces can fit in a horizontal row on
+	 * the user's screen.
+	 */
+	protected int cellWidth = FRAME_WIDTH / FACES_PER_ROW;								
 
 	/*
-	 * Creates a gridWidth * gridWidth grid of cells, with the 
-	 * left/right column and top/bottom row of cells acting as empty buffer
-	 * to prevent clipping. This effectively enables (gridWidth-2) * (gridWidth-2) clickable
-	 * Faces
+	 * Width and height of the sandbox where the user can draw Faces and Vertices.
+	 * The (2*cellWidth) extra space creates a buffer zone so that Faces and Vertices
+	 * do not clip out of the sandbox.
 	 */
-	private int gridWidth = 76;
-
+	private final int SANDBOX_SPACE = (gridWidth*cellWidth) + (2*cellWidth);
+	
 	/*
 	 * Color of the area on which the user draws Faces
 	 */
@@ -64,8 +80,8 @@ public class MainFrame extends JFrame {
 		setTitle(APP_NAME);
 		setLayout(new BorderLayout());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(FRAME_WIDTH, FRAME_HEIGHT);
-		setBounds(0, 0, FRAME_WIDTH, FRAME_HEIGHT);
+		setSize(Math.min(FRAME_WIDTH, SANDBOX_SPACE), Math.min(FRAME_HEIGHT, SANDBOX_SPACE));
+		setBounds(0, 0, Math.min(FRAME_WIDTH, SANDBOX_SPACE), Math.min(FRAME_HEIGHT, SANDBOX_SPACE));
 		setResizable(true);
 
 		// Create a grid_panel which will contain Face and Vertex 
@@ -74,8 +90,8 @@ public class MainFrame extends JFrame {
 
 		// Create a scroll_panel that contains grid_panel, which enables user scrolling behavior for grid_panel
 		scroll_panel = new JScrollPane(grid_panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scroll_panel.getVerticalScrollBar().setUnitIncrement(FRAME_HEIGHT / 10);
-		scroll_panel.getHorizontalScrollBar().setUnitIncrement(FRAME_WIDTH / 15);
+		scroll_panel.getVerticalScrollBar().setUnitIncrement(cellWidth);
+		scroll_panel.getHorizontalScrollBar().setUnitIncrement(cellWidth);
 
 		// Create a ButtonPanel that contains all UI buttons 
 		button_panel = new ButtonPanel((GridPanel) grid_panel);

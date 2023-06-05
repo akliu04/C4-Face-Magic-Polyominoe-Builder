@@ -63,7 +63,7 @@ public class Vertex extends CircleButton{
 					if (numberSet.isEmpty()) {
 						numberSet.add(++nextInt);
 					}
-					// Recalculate the Faces and update the visual labelings
+					// Recalculate the Faces and update the visual labellings
 					ButtonPanel.calculateFaces();
 					ButtonPanel.updateNumberQueueLabel();
 				}
@@ -73,7 +73,7 @@ public class Vertex extends CircleButton{
 	
 	/*
 	 * Helper method to reset the counter and empty the numberSet.
-	 * Used to clear all labelings on screen.
+	 * Used to clear all labellings on screen.
 	 */
 	public static void resetCounter() {
 		nextInt = 1;

@@ -105,15 +105,13 @@ public class PermutationGenerator {
 	/*
 	 * Updates the labels of all Faces and Vertices on screen.
 	 * 
-	 * Assumes all Faces are c4-face-magic and fArr contains at least one Face
 	 */
 	private void updateC4FaceMagicLabels() {
 		for (Vertex v : vArr) {
 			v.setText(v.getValue() + "");
 		}
-		int faceMagicSum = fArr[0].getSum();
 		for (Face f : fArr) {
-			f.setText(faceMagicSum + "");
+			f.setText(f.getSum() + "");
 		}
 	}
 
