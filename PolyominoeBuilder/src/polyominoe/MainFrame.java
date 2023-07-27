@@ -12,7 +12,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 
 public class MainFrame extends JFrame {
-	private final String APP_NAME = "Polyominoe Builder V1.0";					// Name of application
+	private final String APP_NAME = "Polyominoe Builder";					// Name of application
 	private final int USER_SCREEN_WIDTH = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 	private final int USER_SCREEN_HEIGHT = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 	private final int FRAME_WIDTH = USER_SCREEN_WIDTH;						// Width of window in pixels
@@ -25,7 +25,7 @@ public class MainFrame extends JFrame {
 	 * available to the user to draw Faces). Effectively allows for a polyominoe
 	 * of maximum size of gridWidth*gridWidth Faces.
 	 */
-	private int gridWidth = 50;
+	private int gridWidth = 100;
 	
 	/*
 	 * Determines how many Faces can fit in a horizontal row on the user's screen
