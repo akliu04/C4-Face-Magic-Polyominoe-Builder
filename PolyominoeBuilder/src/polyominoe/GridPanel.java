@@ -8,6 +8,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JLayeredPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
 
 public class GridPanel extends JLayeredPane {
 	/*
@@ -74,6 +76,8 @@ public class GridPanel extends JLayeredPane {
 		setBackground(panelColor);
 		setOpaque(true);
 		setVisible(true);
+		// Override disabledText color to not gray out after a Face is frozen
+		UIManager.put("Button.disabledText", new ColorUIResource(Face.colorFrozen));
 
 		// Get the mouse location using position relative to grid_panel (0,0) and
 		// draw a Face if the user left-clicked and the location is in bounds of the sandbox
@@ -156,6 +160,7 @@ public class GridPanel extends JLayeredPane {
 			add(v, JLayeredPane.PALETTE_LAYER);
 		}
 		face.setV0(v);
+		v.setf2(face);
 
 		// Determine if Vertex at face's top-right exists already. If not, create a Vertex there.
 		v = vertexArray[(x+1) + y*GRID_WIDTH];
@@ -165,7 +170,8 @@ public class GridPanel extends JLayeredPane {
 			add(v, JLayeredPane.PALETTE_LAYER);
 		}
 		face.setV1(v);
-
+		v.setf3(face);
+		
 		// Determine if Vertex at face's bottom-right exists already. If not, create a Vertex there.
 		v = vertexArray[(x+1) + (y+1)*GRID_WIDTH];
 		if (v == null) {
@@ -174,6 +180,7 @@ public class GridPanel extends JLayeredPane {
 			add(v, JLayeredPane.PALETTE_LAYER);
 		}
 		face.setV2(v);
+		v.setf0(face);
 
 		// Determine if Vertex at face's bottom-left exists already. If not, create a Vertex there.
 		v = vertexArray[x + (y+1)*GRID_WIDTH];
@@ -183,6 +190,7 @@ public class GridPanel extends JLayeredPane {
 			add(v, JLayeredPane.PALETTE_LAYER);
 		}
 		face.setV3(v);
+		v.setf1(face);
 	}
 
 	/*
@@ -235,7 +243,7 @@ public class GridPanel extends JLayeredPane {
 
 	/*
 	 * Remove a Face's vertices if they are not shared
-	 * with other Faces.
+	 * with other Faces. Used only for eraser (right-click) functionality.
 	 */
 	private void removeVertices(Face f) {
 		int x = f.getGridX();
@@ -250,29 +258,33 @@ public class GridPanel extends JLayeredPane {
 		boolean f5 = faceArray[x + (y+1)*GRID_WIDTH] == null;
 		boolean f6 = faceArray[(x-1) + (y+1)*GRID_WIDTH] == null;
 		boolean f7 = faceArray[(x-1) + y*GRID_WIDTH] == null;
-
+		
 		// Check top-left Vertex
 		if (f0 && f1 && f7) {
 			remove(vertexArray[x + y*GRID_WIDTH]);
 			vertexArray[x + y*GRID_WIDTH] = null;
+			Vertex.setNumNonfrozenVertices(Vertex.getNumNonfrozenVertices()-1);
 		}
 
 		// Check top-right Vertex
 		if (f1 && f2 && f3) {
 			remove(vertexArray[(x+1) + y*GRID_WIDTH]);
 			vertexArray[(x+1) + y*GRID_WIDTH] = null;
+			Vertex.setNumNonfrozenVertices(Vertex.getNumNonfrozenVertices()-1);
 		}
 
 		// Check bottom-right Vertex
 		if (f3 && f4 && f5) {
 			remove(vertexArray[(x+1) + (y+1)*GRID_WIDTH]);
 			vertexArray[(x+1) + (y+1)*GRID_WIDTH] = null;
+			Vertex.setNumNonfrozenVertices(Vertex.getNumNonfrozenVertices()-1);
 		}
 
 		// Check bottom-left Vertex
 		if (f5 && f6 && f7) {
 			remove(vertexArray[x + (y+1)*GRID_WIDTH]);
 			vertexArray[x + (y+1)*GRID_WIDTH] = null;
+			Vertex.setNumNonfrozenVertices(Vertex.getNumNonfrozenVertices()-1);
 		}
 	}
 
@@ -284,6 +296,7 @@ public class GridPanel extends JLayeredPane {
 		faceArray = new Face[faceArray.length];
 		vertexArray = new Vertex[vertexArray.length];
 		removeAll();
+		Vertex.setNumNonfrozenVertices(0);
 		Vertex.resetCounter();
 		revalidate();
 		repaint();

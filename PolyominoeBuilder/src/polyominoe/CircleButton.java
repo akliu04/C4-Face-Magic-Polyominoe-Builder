@@ -16,8 +16,9 @@ public class CircleButton extends JButton {
 	private Color colorNormal;
 	private Color colorHighlight;
 	private Color colorPressed;
+	private Color colorFrozen;
 	
-	private boolean isLocked;
+	private boolean isFrozen;
 
 
 	public CircleButton(String label) {
@@ -26,8 +27,9 @@ public class CircleButton extends JButton {
 		colorNormal = Color.white;
 		colorHighlight = Color.gray;
 		colorPressed = colorHighlight.darker();
+		colorFrozen = Face.colorFrozen;
 		
-		isLocked = false;
+		isFrozen = false;
 
 		setBackground(colorNormal);
 		setFocusable(false);
@@ -62,7 +64,11 @@ public class CircleButton extends JButton {
 	}
 
 	protected void paintBorder(Graphics g) {
-		g.setColor(Color.black);
+		if (!isFrozen) {
+			g.setColor(Color.black);
+		} else {
+			g.setColor(colorFrozen);
+		}
 		g.drawOval(0, 0, getSize().width - 1, getSize().height - 1);
 	}
 
@@ -89,8 +95,12 @@ public class CircleButton extends JButton {
 		colorPressed = c;
 	}
 	
-	public void disableRolloverHighlight() {
-		isLocked = true;
+	public void setColorFrozen(Color c) {
+		colorFrozen = c;
+	}
+	
+	public void setFrozen(boolean frozen) {
+		this.isFrozen = frozen;
 	}
 
 }

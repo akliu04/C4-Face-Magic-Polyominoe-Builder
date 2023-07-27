@@ -14,7 +14,7 @@ public class ButtonPanel extends JPanel{
 	 * as well as resets Vertex numbering for any future Vertices. Frozen Faces and Vertices
 	 * CANNOT be unfrozen.
 	 */
-	private JButton freezeCompleteButton;
+	private JButton freezeButton;
 
 	/*
 	 * A Toggle Button that allows the user to choose whether or not Faces can be 
@@ -45,11 +45,21 @@ public class ButtonPanel extends JPanel{
 	 * A Label that displays the queued numbers available to be inputed into Vertices.
 	 */
 	private static JLabel numberQueueLabel;
-	
+
 	/*
-	 * A Button that calculates EVERY permutation of Vertex labellings.
+	 * A Button that attempts to find a C4-Face-Magic labelling.
 	 */
-	private static JButton testAllPermutationsButton;
+	private static JButton findLabelingButton;
+
+	/*
+	 * A permutation generator that searches for C4-Face-Magic labellings.
+	 */
+	private PermutationGenerator permGen;
+
+	/*
+	 * Text used by the experimental findLabellingButton
+	 */
+	private static String startSearchText, endSearchText, startSearchTooltipText, endSearchTooltipText;
 
 
 	/*
@@ -57,21 +67,19 @@ public class ButtonPanel extends JPanel{
 	 */
 	public ButtonPanel(GridPanel gridPanel) {
 		// Create the freezeCompleteButton
-		freezeCompleteButton = new JButton("Freeze Labelled");
-		freezeCompleteButton.setFocusable(false);
-		freezeCompleteButton.setToolTipText("<html>" 
-				+ "Freeze all fully-labelled polyominoes. Cannot be undone"
-				+ "<br>"
-				+ "Clears all labelings of non-fully labelled polyominoes.");
-		freezeCompleteButton.addActionListener(new ActionListener() {
+		freezeButton = new JButton("Freeze");
+		freezeButton.setFocusable(false);
+		freezeButton.setToolTipText("<html>" 
+				+ "Freeze all polyominoes. Cannot be undone.");
+		freezeButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				for (Face face : GridPanel.faceArray) {
-					if (face != null && face.hasAllLabeledVertices()) {
-						face.setFrozenTrue();
+					if (face != null) {
+						face.setFrozen(true);
 					}
 				}
-				gridPanel.clearVertexNumbers();
+				Vertex.resetCounter();
 			}
 		});
 
@@ -94,19 +102,22 @@ public class ButtonPanel extends JPanel{
 		});
 
 		// Create the clearButton
-		clearButton = new JButton("Clear");
+		clearButton = new JButton("Clear All");
 		clearButton.setFocusable(false);
 		clearButton.setToolTipText("<html>" 
 				+ "Clear all polyominoes");
 		clearButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				gridPanel.clearGrid();
+				// If a search is not already in progress
+				if (!PermutationGenerator.searchInProgress) {
+					gridPanel.clearGrid();
+				}
 			}
 		});
 
 		// Create the clearVertexNumbersButton
-		clearVertexNumbersButton = new JButton("Renumber");
+		clearVertexNumbersButton = new JButton("Clear Labelings");
 		clearVertexNumbersButton.setFocusable(false);
 		clearVertexNumbersButton.setToolTipText("<html>" 
 				+ "Clear all vertex numbers");
@@ -119,46 +130,72 @@ public class ButtonPanel extends JPanel{
 
 		// Create the nextNumberLabel
 		nextNumberLabel = new JLabel("Next:");
+		nextNumberLabel.setFocusable(false);
 		nextNumberLabel.setToolTipText("<html>" 
 				+ "Numbers waiting to be inputted will appear here");
 
 		// Create the numberQueueLabel
 		numberQueueLabel = new JLabel("1");
+		numberQueueLabel.setFocusable(false);
 		numberQueueLabel.setToolTipText("<html>" 
 				+ "Numbers waiting to be inputted will appear here");
-		
+
+
+
 		// Create the testAllPermutationsButton
-		testAllPermutationsButton = new JButton("Test All Labellings");
-		testAllPermutationsButton.setFocusable(false);
-		testAllPermutationsButton.setToolTipText("<html>" 
-				+ "Test all permutations of possible labellings"
+		startSearchText = "Find a Labeling";
+		endSearchText = "Stop";
+		startSearchTooltipText = "<html>" 
+				+ "Attempt to find a C4-Face-Magic Labeling"
 				+ "<br>"
-				+ "WARNING: Time to calculate all permutations is (#vertices)!"
-				+ "Ideally used for polyominoes with < 14 vertices");
-		testAllPermutationsButton.addActionListener(new ActionListener() {
+				+ "WARNING: Time to find a labelling, if it exists, depends on polyominoe and system";
+		endSearchTooltipText = "<html>" 
+				+ "Stop the search for a C4-Face-Magic Labeling.";
+		findLabelingButton = new JButton(startSearchText);
+		findLabelingButton.setFocusable(false);
+		findLabelingButton.setToolTipText(startSearchTooltipText);
+		findLabelingButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Copy all non-null Vertices in vertexArray to vArr for more efficient permutation generation
-				Vertex[] vArr = getNonNullLabelledCopiesVertex();
-				Face[] fArr = getNonNullCopiesFace();
-				if (fArr.length != 0) {
-					PermutationGenerator permGen = new PermutationGenerator();
-					permGen.generateAllLabellings(vArr, fArr, vArr.length);
-					freezeCompleteButton.doClick(); 
+				// If a search is not already in progress
+				if (!PermutationGenerator.searchInProgress) {
+					// Copy all non-null Vertices in vertexArray to vArr for more efficient permutation generation and clear all labelings
+					Face[] fArr = getNonFrozenFaces();
+					if (fArr.length != 0) {
+						Vertex[] vArr = getNonFrozenVertices();
+						freezeButton.doClick();
+						
+						// Start finding a labeling
+						permGen = new PermutationGenerator(vArr, fArr);
+						permGen.start();
+
+						// Once search has started, behave like a stop button
+						findLabelingButton.setText(endSearchText);
+						findLabelingButton.setToolTipText(endSearchTooltipText);
+					}
+				} else {
+					// If a search is in progress, behave like a stop button and reset
+					permGen.interrupt();
 				}
 			}
 		});
-		
-		
 
 		// Add the buttons to it
-		add(testAllPermutationsButton);
-		add(freezeCompleteButton);
-		add(lockButton);
+		add(findLabelingButton);
+		add(freezeButton);
+		//add(lockButton);
 		add(clearVertexNumbersButton);
 		add(clearButton);
 		add(nextNumberLabel);
 		add(numberQueueLabel);
+	}
+
+	/*
+	 * Reset the findLabellingButton if not stopped manually.
+	 */
+	public static void resetFindLabellingButton() {
+		findLabelingButton.setText(startSearchText);
+		findLabelingButton.setToolTipText(startSearchTooltipText);
 	}
 
 	/*
@@ -174,7 +211,8 @@ public class ButtonPanel extends JPanel{
 	}
 
 	/*
-	 * Displays the sum of all Faces that have at least one numbered Vertex
+	 * Displays the sum of all Faces that have at least one numbered Vertex.
+	 * Calculates for every single Face.
 	 */
 	public static void calculateFaces() {
 		for (Face f : GridPanel.faceArray) {
@@ -187,47 +225,47 @@ public class ButtonPanel extends JPanel{
 			}
 		}
 	}
-	
+
 	/*
-	 * Helper method to return an array of copies of non-null values of vertexArray
-	 * with labels 1 - numVertices
+	 * Returns an array of all non-frozen Vertices
 	 */
-	private Vertex[] getNonNullLabelledCopiesVertex() {
+	private Vertex[] getNonFrozenVertices() {
 		Vertex[] vArr;
 		int length = 0;
 		int index = 0;
 		for (Vertex v : GridPanel.vertexArray) {
-			if (v != null) {
+			if (v != null && !v.isFrozen()) {
 				length++;
 			}
 		}
 		vArr = new Vertex[length];
 		for (Vertex v : GridPanel.vertexArray) {
-			if (v != null) {
-				v.setValue(index+1);
+			if (v != null && !v.isFrozen()) {
 				vArr[index++] = v;
 			}
 		}
 		return vArr;
 	}
+
 	/*
-	 * Helper method to return an array of copies of non-null values of faceArray
+	 * Returns an array of all non-frozen Faces
 	 */
-	private Face[] getNonNullCopiesFace() {
+	private Face[] getNonFrozenFaces() {
 		Face[] fArr;
 		int length = 0;
 		int index = 0;
 		for (Face f : GridPanel.faceArray) {
-			if (f != null) {
+			if (f != null && !f.isFrozen()) {
 				length++;
 			}
 		}
 		fArr = new Face[length];
 		for (Face f : GridPanel.faceArray) {
-			if (f != null) {
+			if (f != null && !f.isFrozen()) {
 				fArr[index++] = f;
 			}
 		} 
 		return fArr;
 	}
+
 }

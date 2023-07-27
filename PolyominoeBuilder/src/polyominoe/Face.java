@@ -1,15 +1,15 @@
 package polyominoe;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Insets;
+
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
 public class Face extends JButton {
 	// The Face's four vertices. v0 corresponds to Face's top-left and proceed clockwise
-	private Vertex v0;					 
-	private Vertex v1;
-	private Vertex v2;
-	private Vertex v3;
+	private Vertex v0, v1, v2, v3;
 
 	// Width of grid_panel in pixels
 	private int width;
@@ -24,13 +24,16 @@ public class Face extends JButton {
 
 	// Colors
 	private Color colorNormal = Color.WHITE;
+	private Color colorBorder = Color.BLACK;
 	private Color colorHighlight = new Color(200, 229, 247);
+	static Color colorFrozen = Color.RED;
 
 	// Boolean determines whether or not this Face is interactable
 	private boolean isFrozen;
 
 	// A reference to the GridPanel on which this Face resides on. Used for removing itself off of parentGrid.
 	private GridPanel parentGrid;
+
 
 
 	/*
@@ -47,6 +50,7 @@ public class Face extends JButton {
 		yAbsLoc = y*width;
 
 		setFocusable(false);
+		setMargin(new Insets(0, 0, 0, 0));
 		setFont(new Font("Arial", Font.PLAIN, width / 4));
 		setBackground(colorNormal);
 		setSize(width, width);
@@ -139,35 +143,35 @@ public class Face extends JButton {
 		vertex.setLocation(x, y);
 		return vertex;
 	}
-	
+
 	/*
 	 * Returns the x-grid coordinate of this Face (not absolute position)
 	 */
 	public int getGridX() {
 		return xGridLoc;
 	}
-	
+
 	/*
 	 * Returns the y-grid coordinate of this Face (not absolute position)
 	 */
 	public int getGridY() {
 		return yGridLoc;
 	}
-	
+
 	/*
 	 * Set this Face's top-left Vertex value to v
 	 */
 	public void setV0(Vertex v) {
 		v0 = v;
 	}
-	
+
 	/*
 	 * Set this Face's top-right Vertex value to v
 	 */
 	public void setV1(Vertex v) {
 		v1 = v;
 	}
-	
+
 	/*
 	 * Set this Face's bottom-left Vertex value to v
 	 */
@@ -180,6 +184,34 @@ public class Face extends JButton {
 	 */
 	public void setV3(Vertex v) {
 		v3 = v;
+	}
+
+	/*
+	 * Returns the top-left Vertex
+	 */
+	public Vertex getV0() {
+		return v0;
+	}
+
+	/*
+	 * Returns the top-right Vertex
+	 */
+	public Vertex getV1() {
+		return v1;
+	}
+
+	/*
+	 * Returns the bottom-right Vertex
+	 */
+	public Vertex getV2() {
+		return v2;
+	}
+
+	/*
+	 * Returns the bottom-left Vertex
+	 */
+	public Vertex getV3() {
+		return v3;
 	}
 
 	/*
@@ -215,12 +247,35 @@ public class Face extends JButton {
 	/*
 	 * Freezes this Face and its Vertices
 	 */
-	public void setFrozenTrue() {
-		isFrozen = true;
-		setEnabled(false);
-		v0.setFrozenTrue();
-		v1.setFrozenTrue();
-		v2.setFrozenTrue();
-		v3.setFrozenTrue();
+	public void setFrozen(boolean frozen) {
+		if (frozen == true) {
+			isFrozen = true;
+			setEnabled(false);
+			setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createLineBorder(colorFrozen, 1), 
+					BorderFactory.createEmptyBorder(
+							getBorder().getBorderInsets(this).top, 
+							getBorder().getBorderInsets(this).left, 
+							getBorder().getBorderInsets(this).bottom, 
+							getBorder().getBorderInsets(this).right)));
+			v0.setFrozen(true);
+			v1.setFrozen(true);
+			v2.setFrozen(true);
+			v3.setFrozen(true);
+		} else {
+			isFrozen = false;
+			setEnabled(true);
+			setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createLineBorder(colorBorder, 1), 
+					BorderFactory.createEmptyBorder(
+							getBorder().getBorderInsets(this).top, 
+							getBorder().getBorderInsets(this).left, 
+							getBorder().getBorderInsets(this).bottom, 
+							getBorder().getBorderInsets(this).right)));
+			v0.setFrozen(false);
+			v1.setFrozen(false);
+			v2.setFrozen(false);
+			v3.setFrozen(false);
+		}
 	}
 }
