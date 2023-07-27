@@ -1,6 +1,11 @@
 package polyominoe;
 
 import java.awt.Font;
+<<<<<<< Updated upstream
+=======
+import java.awt.Graphics;
+import java.awt.Insets;
+>>>>>>> Stashed changes
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.TreeSet;
@@ -34,6 +39,7 @@ public class Vertex extends CircleButton{
 	 */
 	public Vertex(int radius) {
 		super("");
+		setMargin(new Insets(0, 0, 0, 0));
 		setFont(new Font("Arial", Font.PLAIN, (int) (radius / 3)));
 		setSize(radius, radius);
 		isFrozen = false;
@@ -70,14 +76,38 @@ public class Vertex extends CircleButton{
 			}
 		});
 	}
+<<<<<<< Updated upstream
 	
+=======
+
+	/*
+	 * Updates the values for all Faces that share this Vertex.
+	 */
+	private void updateFaceValues() {
+		ArrayList<Face> faces = new ArrayList<Face>();
+		faces.add(f0);
+		faces.add(f1);
+		faces.add(f2);
+		faces.add(f3);
+		for (Face f : faces) {
+			if (f != null && !f.isFrozen()) { 
+				if (f.getSum() != 0) {
+					f.setText("" + f.getSum());
+				} else {
+					f.setText("");
+				}
+			}
+		}
+	}
+
+>>>>>>> Stashed changes
 	/*
 	 * Helper method to reset the counter and empty the numberSet.
 	 * Used to clear all labellings on screen.
 	 */
 	public static void resetCounter() {
 		nextInt = 1;
-		numberSet = new TreeSet<Integer>();
+		numberSet.clear();
 		numberSet.add(nextInt);
 		ButtonPanel.updateNumberQueueLabel();
 	}

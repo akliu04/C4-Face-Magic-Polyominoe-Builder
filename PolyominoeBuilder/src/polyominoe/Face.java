@@ -1,6 +1,12 @@
 package polyominoe;
 import java.awt.Color;
 import java.awt.Font;
+<<<<<<< Updated upstream
+=======
+import java.awt.Insets;
+
+import javax.swing.BorderFactory;
+>>>>>>> Stashed changes
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
@@ -25,6 +31,10 @@ public class Face extends JButton {
 	// Colors
 	private Color colorNormal = Color.WHITE;
 	private Color colorHighlight = new Color(200, 229, 247);
+<<<<<<< Updated upstream
+=======
+	static Color colorFrozen = Color.RED;
+>>>>>>> Stashed changes
 
 	// Boolean determines whether or not this Face is interactable
 	private boolean isFrozen;
@@ -47,6 +57,7 @@ public class Face extends JButton {
 		yAbsLoc = y*width;
 
 		setFocusable(false);
+		setMargin(new Insets(0, 0, 0, 0));
 		setFont(new Font("Arial", Font.PLAIN, width / 4));
 		setBackground(colorNormal);
 		setSize(width, width);

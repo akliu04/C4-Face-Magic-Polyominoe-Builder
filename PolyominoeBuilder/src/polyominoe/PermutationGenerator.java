@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 /*
+<<<<<<< Updated upstream
  * Use Heap's algorithm to generate all possible Vertex labellings. 
  * Counter for number of permutations generated limited to 20! (due to use of long over BigInteger)
  * for speed optimization
@@ -24,6 +25,40 @@ public class PermutationGenerator {
 		numPermutationsGenerated++;
 		if (isC4FaceMagic()) {
 			numC4Labellings++;
+=======
+ * Use Heap's algorithm to generate all possible Vertex labellings using the user's initial inputs for Vertices. 
+ * If a c4-Face-Magic labelling is found, the polyominoe is labelled and 
+ * permutation generation stops.
+ */
+public class PermutationGenerator extends Thread {
+	static boolean searchInProgress = false;
+	long numPermutationsGenerated = 0;
+
+
+	private Vertex[] vArr;
+	private Vertex[] emptyVertices;
+	private int[] filledVertexValues;
+	private Face[] fArr;
+
+	public PermutationGenerator(Vertex[] vertices, Face[] faces) {
+		this.vArr = vertices;
+		this.fArr = faces;
+		fillEmptyAndFilledArrays();
+		fillMissingValues(emptyVertices);
+	}
+
+	public void run() {
+		generateAllLabellings();
+	}
+
+	private void generateAllLabellings() {
+		searchInProgress = true;
+		// Generate all permutations of Vertex labellings or until a c4-Face-Magic labelling is found
+		int n = emptyVertices.length;
+		int[] c = new int[n];
+		// Generates the first permutation. All vertices are assigned values 1 through n.
+		if (isC4FaceMagic() && !isInterrupted()) {
+>>>>>>> Stashed changes
 			updateC4FaceMagicLabels();
 			printC4FaceMagicVertexLabels();
 		}
@@ -49,12 +84,78 @@ public class PermutationGenerator {
 				i++;
 			}
 		}
+<<<<<<< Updated upstream
 		
 		// Print out useful information to console
 		System.out.println("Done!");
 		System.out.println("Generated " + vArr.length + "! ("+ numPermutationsGenerated + ") total labellings.");
 		System.out.println("There exists " + numC4Labellings + " c4-face-magic labellings (including symmetric labellings) for this graph.");
 		System.out.println("All possible c4-face-magic values: " + sortedC4FaceMagicValues(c4FaceMagicValueSet));
+=======
+		// Cleanup if thread is interrupted
+		if (!isC4FaceMagic() || isInterrupted()) {
+			for (Vertex v : vArr) {
+				v.setFrozen(false);
+				v.setValue(0);
+				v.setText("");
+			}
+			for (Face f : fArr) {
+				f.setFrozen(false);
+				f.setText("");
+			}
+			ButtonPanel.resetFindLabellingButton();
+		} else if (isC4FaceMagic()) {
+			// If a C4-Face-Magic Labelling was found instead, freeze the labelling
+			for (Face f : fArr) {
+				f.setFrozen(true);
+			}
+		}
+		searchInProgress = false;
+		ButtonPanel.resetFindLabellingButton();
+	}
+	
+	/*
+	 * Fills the emptyVertices array with all Vertices in vArr that have value 0
+	 * and the filledVertexValues array with all integers in vArr that are non-zero.
+	 */
+	private void fillEmptyAndFilledArrays() {
+		int length = 0;
+		int i = 0;
+		int j = 0;
+		for (Vertex v : vArr) {
+			if (v.getValue() == 0) {
+				length++;
+			}
+		}
+		emptyVertices = new Vertex[length];
+		filledVertexValues = new int[vArr.length - length];
+		for (Vertex v : vArr) {
+			if (v.getValue() == 0) {
+				emptyVertices[i++] = v;
+			} else {
+				filledVertexValues[j++] = v.getValue();
+			}
+		}
+	}
+	
+	/*
+	 * Fills in the given array of Vertices with values 1 to N where N is the
+	 * number of Vertices and each value is missing from vArr.
+	 */
+	private void fillMissingValues(Vertex[] arr) {
+		Arrays.sort(filledVertexValues);
+		int indexOfFilled = 0;
+		int indexOfEmpty = 0;
+		int num = 1;
+		for (int i = 0; i < vArr.length; i++) {
+			if (indexOfFilled >= filledVertexValues.length || num != filledVertexValues[indexOfFilled]) {
+				arr[indexOfEmpty++].setValue(num);
+			} else {
+				indexOfFilled++;
+			}
+			num++;
+		}
+>>>>>>> Stashed changes
 	}
 
 	/*
@@ -81,9 +182,9 @@ public class PermutationGenerator {
 	 * Helper method to swap two Vertex values
 	 */
 	private void swap(int i, int j) {
-		int temp = vArr[i].getValue();
-		vArr[i].setValue(vArr[j].getValue());
-		vArr[j].setValue(temp);
+		int temp = emptyVertices[i].getValue();
+		emptyVertices[i].setValue(emptyVertices[j].getValue());
+		emptyVertices[j].setValue(temp);
 	}
 
 	/*
@@ -127,5 +228,12 @@ public class PermutationGenerator {
 		}
 		System.out.println(s.substring(0, s.length() - 2) + " : " + fArr[0].getSum());
 	}
-
+	
+	private void printArray(Vertex[] arr) {
+		String s = "";
+		for (Vertex v : arr) {
+			s += v.getValue() + ", ";
+		}
+		System.out.println(s);
+	}
 }

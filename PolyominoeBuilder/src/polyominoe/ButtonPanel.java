@@ -45,11 +45,29 @@ public class ButtonPanel extends JPanel{
 	 * A Label that displays the queued numbers available to be inputed into Vertices.
 	 */
 	private static JLabel numberQueueLabel;
+<<<<<<< Updated upstream
 	
+=======
+
+	/*
+	 * A Button that attempts to find a C4-Face-Magic labelling.
+	 */
+	private static JButton findLabelingButton;
+
+>>>>>>> Stashed changes
 	/*
 	 * A Button that calculates EVERY permutation of Vertex labellings.
 	 */
+<<<<<<< Updated upstream
 	private static JButton testAllPermutationsButton;
+=======
+	private PermutationGenerator permGen;
+
+	/*
+	 * Text used by the experimental findLabellingButton
+	 */
+	private static String startSearchText, endSearchText, startSearchTooltipText, endSearchTooltipText;
+>>>>>>> Stashed changes
 
 
 	/*
@@ -67,11 +85,19 @@ public class ButtonPanel extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				for (Face face : GridPanel.faceArray) {
+<<<<<<< Updated upstream
 					if (face != null && face.hasAllLabeledVertices()) {
 						face.setFrozenTrue();
 					}
 				}
 				gridPanel.clearVertexNumbers();
+=======
+					if (face != null) {
+						face.setFrozen(true);
+					}
+				}
+				Vertex.resetCounter();
+>>>>>>> Stashed changes
 			}
 		});
 
@@ -106,7 +132,11 @@ public class ButtonPanel extends JPanel{
 		});
 
 		// Create the clearVertexNumbersButton
+<<<<<<< Updated upstream
 		clearVertexNumbersButton = new JButton("Renumber");
+=======
+		clearVertexNumbersButton = new JButton("Clear Labelings");
+>>>>>>> Stashed changes
 		clearVertexNumbersButton.setFocusable(false);
 		clearVertexNumbersButton.setToolTipText("<html>" 
 				+ "Clear all vertex numbers");
@@ -119,13 +149,16 @@ public class ButtonPanel extends JPanel{
 
 		// Create the nextNumberLabel
 		nextNumberLabel = new JLabel("Next:");
+		nextNumberLabel.setFocusable(false);
 		nextNumberLabel.setToolTipText("<html>" 
 				+ "Numbers waiting to be inputted will appear here");
 
 		// Create the numberQueueLabel
 		numberQueueLabel = new JLabel("1");
+		numberQueueLabel.setFocusable(false);
 		numberQueueLabel.setToolTipText("<html>" 
 				+ "Numbers waiting to be inputted will appear here");
+<<<<<<< Updated upstream
 		
 		// Create the testAllPermutationsButton
 		testAllPermutationsButton = new JButton("Test All Labellings");
@@ -145,6 +178,46 @@ public class ButtonPanel extends JPanel{
 					PermutationGenerator permGen = new PermutationGenerator();
 					permGen.generateAllLabellings(vArr, fArr, vArr.length);
 					freezeCompleteButton.doClick(); 
+=======
+
+
+
+		// Create the testAllPermutationsButton
+		startSearchText = "Find a Labeling";
+		endSearchText = "Stop";
+		startSearchTooltipText = "<html>" 
+				+ "Attempt to find a C4-Face-Magic Labeling"
+				+ "<br>"
+				+ "WARNING: Time to find a labelling, if it exists, depends on polyominoe and system";
+		endSearchTooltipText = "<html>" 
+				+ "Stop the search for a C4-Face-Magic Labeling.";
+		findLabelingButton = new JButton(startSearchText);
+		findLabelingButton.setFocusable(false);
+		findLabelingButton.setToolTipText(startSearchTooltipText);
+		findLabelingButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// If a search is not already in progress
+				if (!PermutationGenerator.searchInProgress) {
+					// Copy all non-null Vertices in vertexArray to vArr for more efficient permutation generation and clear all labelings
+					Face[] fArr = getNonFrozenFaces();
+					if (fArr.length != 0) {
+						Vertex[] vArr = getNonFrozenVertices();
+						for (Face f : fArr) {
+							f.setFrozen(true);
+						}
+						Vertex.resetCounter();
+						// Start finding a labeling
+						permGen = new PermutationGenerator(vArr, fArr);
+						permGen.start();
+						// Once search has started, behave like a stop button
+						findLabelingButton.setText(endSearchText);
+						findLabelingButton.setToolTipText(endSearchTooltipText);
+					}
+				} else {
+					// If a search is in progress, behave like a stop button and reset
+					permGen.interrupt();
+>>>>>>> Stashed changes
 				}
 			}
 		});
@@ -152,15 +225,32 @@ public class ButtonPanel extends JPanel{
 		
 
 		// Add the buttons to it
+<<<<<<< Updated upstream
 		add(testAllPermutationsButton);
 		add(freezeCompleteButton);
 		add(lockButton);
+=======
+		add(findLabelingButton);
+		add(freezeButton);
+		//add(lockButton);
+>>>>>>> Stashed changes
 		add(clearVertexNumbersButton);
 		add(clearButton);
 		add(nextNumberLabel);
 		add(numberQueueLabel);
 	}
 
+<<<<<<< Updated upstream
+=======
+	/*
+	 * Reset the findLabellingButton if not stopped manually.
+	 */
+	public static void resetFindLabellingButton() {
+		findLabelingButton.setText(startSearchText);
+		findLabelingButton.setToolTipText(startSearchTooltipText);
+	}
+
+>>>>>>> Stashed changes
 	/*
 	 * Updates the list of numbers that appear on screen to the most recent list
 	 * of available numbers.
@@ -189,42 +279,54 @@ public class ButtonPanel extends JPanel{
 	}
 	
 	/*
+<<<<<<< Updated upstream
 	 * Helper method to return an array of copies of non-null values of vertexArray
 	 * with labels 1 - numVertices
+=======
+	 * Returns an array of all non-frozen Vertices
+>>>>>>> Stashed changes
 	 */
-	private Vertex[] getNonNullLabelledCopiesVertex() {
+	private Vertex[] getNonFrozenVertices() {
 		Vertex[] vArr;
 		int length = 0;
 		int index = 0;
 		for (Vertex v : GridPanel.vertexArray) {
-			if (v != null) {
+			if (v != null && !v.isFrozen()) {
 				length++;
 			}
 		}
 		vArr = new Vertex[length];
 		for (Vertex v : GridPanel.vertexArray) {
+<<<<<<< Updated upstream
 			if (v != null) {
 				v.setValue(index+1);
+=======
+			if (v != null && !v.isFrozen()) {
+>>>>>>> Stashed changes
 				vArr[index++] = v;
 			}
 		}
 		return vArr;
 	}
 	/*
-	 * Helper method to return an array of copies of non-null values of faceArray
+	 * Returns an array of all non-frozen Faces
 	 */
-	private Face[] getNonNullCopiesFace() {
+	private Face[] getNonFrozenFaces() {
 		Face[] fArr;
 		int length = 0;
 		int index = 0;
 		for (Face f : GridPanel.faceArray) {
-			if (f != null) {
+			if (f != null && !f.isFrozen()) {
 				length++;
 			}
 		}
 		fArr = new Face[length];
 		for (Face f : GridPanel.faceArray) {
+<<<<<<< Updated upstream
 			if (f != null) {
+=======
+			if (f != null && !f.isFrozen()) {
+>>>>>>> Stashed changes
 				fArr[index++] = f;
 			}
 		} 
