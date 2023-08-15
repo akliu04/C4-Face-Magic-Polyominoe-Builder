@@ -1,5 +1,5 @@
 # C4-Face-Magic-Polyominoe-Builder
-A GUI tool to build C4-polyominoes.
+A GUI tool to build and explore C4-polyominoes.
 
 Functionality:
 1. Draw Polyominoes: Left-click anywhere in the sandbox to draw a polyominoe. Hold left-click to drag and draw faster. Polyominoes drawn adjacent to each other will share vertices and/or edges.
