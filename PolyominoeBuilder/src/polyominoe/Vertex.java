@@ -69,7 +69,10 @@ public class Vertex extends CircleButton{
 		if (numberSet.isEmpty()) {
 			numberSet.add(1);
 		}
-
+		
+		
+		// Mouse Click Behavior
+		// Clicking a Vertex will label it with the smallest available number in the integer sequence
 		addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -106,14 +109,19 @@ public class Vertex extends CircleButton{
 			}
 		});
 		
+		
+		// Keyboard input for Vertices
+		// When hovering over a Vertex, user can type in a valid integer to label it
 		addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseEntered(java.awt.event.MouseEvent e) {
+				// Get focus when Vertex is hovered over
 				if (!isFrozen) {
 					keyboardStringInput = "";
 					setFocusable(true);
 					requestFocusInWindow();
 				}
 			}
+			// Confirm input and label Vertex once the mouse cursor leaves the Vertex
 			public void mouseExited(java.awt.event.MouseEvent e) {
 				if (!isFrozen && value == 0) {
 					int newValue;
@@ -149,7 +157,7 @@ public class Vertex extends CircleButton{
 				}
 			}
 		});
-		
+		// KeyListener that accepts only integer inputs, spacebar acts as a normal left-click
 		addKeyListener(new java.awt.event.KeyListener() {
 			public void keyTyped(KeyEvent e) {
 				char c = e.getKeyChar();

@@ -203,11 +203,7 @@ public class ButtonPanel extends JPanel{
 	 * of available numbers.
 	 */
 	public static void updateNumberQueueLabel() {
-		String newText = "";
-		for (Integer number : Vertex.getNumberSet()) {
-			newText += number + ", ";
-		}
-		numberQueueLabel.setText(newText.substring(0, newText.length()-2));
+		numberQueueLabel.setText(Vertex.getNumberSet().first() + "");
 	}
 
 	/*
